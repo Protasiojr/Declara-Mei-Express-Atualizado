@@ -24,8 +24,8 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
 
     return (
-        <aside className="w-64 bg-gray-900 text-gray-300 flex flex-col border-r border-gray-700">
-            <div className="h-16 flex items-center justify-center border-b border-gray-700">
+        <aside className="w-64 bg-green-950 text-gray-300 flex flex-col border-r border-green-800">
+            <div className="h-16 flex items-center justify-center border-b border-green-800">
                 <h1 className="text-xl font-bold text-white">Declara Mei Express</h1>
             </div>
             <nav className="flex-1 px-4 py-6 space-y-2">
@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
                         to={item.path}
                         className={({ isActive }) =>
                             `flex items-center px-4 py-2 rounded-lg transition-colors duration-200 ${
-                                isActive ? 'bg-indigo-600 text-white' : 'hover:bg-gray-700 hover:text-white'
+                                isActive ? 'bg-green-600 text-white' : 'hover:bg-green-800 hover:text-white'
                             }`
                         }
                     >
@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
                     </NavLink>
                 ))}
             </nav>
-            <div className="p-4 border-t border-gray-700">
+            <div className="p-4 border-t border-green-800">
                 <p className="text-xs text-gray-500">Desenvolvido por João Protásio Jr.</p>
                 <p className="text-xs text-gray-500">Versão 1.0</p>
             </div>
@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
 const Header: React.FC = () => {
     const { logout } = useAuth();
     return (
-        <header className="h-16 bg-gray-800 text-gray-300 flex items-center justify-end px-6 border-b border-gray-700">
+        <header className="h-16 bg-green-900 text-gray-300 flex items-center justify-end px-6 border-b border-green-800">
             <div className="flex items-center space-x-4">
                 <div className="relative">
                     <button className="flex items-center space-x-2">
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
                         <ChevronDownIcon className="w-4 h-4" />
                     </button>
                 </div>
-                <button onClick={logout} className="p-2 rounded-full hover:bg-gray-700" title="Sair">
+                <button onClick={logout} className="p-2 rounded-full hover:bg-green-800" title="Sair">
                     <LogOutIcon className="w-5 h-5" />
                 </button>
             </div>
@@ -74,11 +74,11 @@ const Header: React.FC = () => {
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <div className="flex h-screen bg-gray-800 text-gray-100">
+        <div className="flex h-screen bg-green-900 text-gray-100">
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-800 p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-green-900 p-6">
                     {children}
                 </main>
             </div>

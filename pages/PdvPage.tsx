@@ -38,12 +38,12 @@ const PdvPage: React.FC = () => {
     if (!isCashierOpen) {
         return (
             <div className="flex items-center justify-center h-full">
-                <div className="text-center bg-gray-800 p-10 rounded-lg border border-gray-700">
+                <div className="text-center bg-green-900 p-10 rounded-lg border border-green-800">
                     <h2 className="text-2xl font-bold text-white mb-4">Caixa Fechado</h2>
                     <p className="text-gray-400 mb-6">Você precisa abrir o caixa para iniciar as vendas.</p>
                     <button 
                         onClick={() => setIsCashierOpen(true)}
-                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700"
+                        className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700"
                     >
                         Abrir Caixa
                     </button>
@@ -56,14 +56,14 @@ const PdvPage: React.FC = () => {
         <div className="h-full flex flex-col lg:flex-row gap-6">
             {/* Products Grid */}
             <div className="lg:w-2/3">
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <div className="bg-green-900 p-4 rounded-lg border border-green-800">
                     <h2 className="text-xl font-bold text-white mb-4">Produtos para Venda Rápida</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {quickProducts.map(p => (
                             <button
                                 key={p.id}
                                 onClick={() => addToCart(p)}
-                                className="bg-gray-700 p-4 rounded-lg text-center hover:bg-indigo-600 transition-colors"
+                                className="bg-green-800 p-4 rounded-lg text-center hover:bg-green-600 transition-colors"
                             >
                                 <p className="font-semibold text-white">{p.name}</p>
                                 <p className="text-sm text-gray-300">R$ {p.price.toFixed(2)}</p>
@@ -75,7 +75,7 @@ const PdvPage: React.FC = () => {
 
             {/* Current Sale */}
             <div className="lg:w-1/3 flex flex-col">
-                <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 flex-grow flex flex-col">
+                <div className="bg-green-900 p-6 rounded-lg border border-green-800 flex-grow flex flex-col">
                     <h2 className="text-2xl font-bold text-white mb-4">Venda Atual</h2>
                     <div className="flex-grow overflow-y-auto pr-2">
                         {cart.length === 0 ? (
@@ -98,7 +98,7 @@ const PdvPage: React.FC = () => {
                             </ul>
                         )}
                     </div>
-                    <div className="border-t border-gray-700 mt-4 pt-4">
+                    <div className="border-t border-green-800 mt-4 pt-4">
                         <div className="flex justify-between text-xl font-bold text-white">
                             <span>Total</span>
                             <span>R$ {total.toFixed(2)}</span>
@@ -113,7 +113,7 @@ const PdvPage: React.FC = () => {
                         </div>
                          <button 
                             onClick={() => setIsCashierOpen(false)}
-                            className="w-full mt-4 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-500"
+                            className="w-full mt-4 bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-600"
                         >
                             Fechar Caixa
                         </button>

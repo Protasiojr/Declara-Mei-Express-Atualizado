@@ -2,7 +2,7 @@
 import React from 'react';
 
 const FormSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
+    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
         <h2 className="text-xl font-semibold text-white mb-6">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {children}
@@ -16,7 +16,7 @@ const FormField: React.FC<{ label: string; value: string }> = ({ label, value })
         <input 
             type="text" 
             defaultValue={value}
-            className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full bg-green-800 border-green-700 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500"
         />
     </div>
 );
@@ -45,7 +45,7 @@ const CompanyPage: React.FC = () => {
                 </FormSection>
 
                 <div className="flex justify-end">
-                    <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700">
+                    <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700">
                         Salvar Alterações
                     </button>
                 </div>

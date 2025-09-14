@@ -1,10 +1,14 @@
 
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon } from '../components/icons';
 
-const StatCard: React.FC<{ title: string; value: string; status?: string; statusColor?: string }> = ({ title, value, status, statusColor = 'text-green-400' }) => (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
-        <h3 className="text-sm font-medium text-gray-400">{title}</h3>
+const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; status?: string; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
+    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+        <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-400">{title}</h3>
+            {icon}
+        </div>
         <p className="text-3xl font-semibold text-white mt-2">{value}</p>
         {status && <p className={`text-xs mt-2 ${statusColor}`}>{status}</p>}
     </div>
@@ -71,13 +75,13 @@ const SalesSummary: React.FC = () => {
     };
 
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-gray-700 pb-4 mb-4">
+        <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-green-800 pb-4 mb-4">
                  <h3 className="text-lg font-semibold text-white mb-2 sm:mb-0">Resumo de Vendas</h3>
-                 <div className="flex space-x-1 bg-gray-900 p-1 rounded-lg self-start sm:self-center">
-                    <button onClick={() => setActiveTab('daily')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'daily' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>Diário</button>
-                    <button onClick={() => setActiveTab('monthly')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'monthly' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>Mensal</button>
-                    <button onClick={() => setActiveTab('annual')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'annual' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>Anual</button>
+                 <div className="flex space-x-1 bg-green-950 p-1 rounded-lg self-start sm:self-center">
+                    <button onClick={() => setActiveTab('daily')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'daily' ? 'bg-green-600 text-white' : 'text-gray-300 hover:bg-green-800'}`}>Diário</button>
+                    <button onClick={() => setActiveTab('monthly')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'monthly' ? 'bg-green-600 text-white' : 'text-gray-300 hover:bg-green-800'}`}>Mensal</button>
+                    <button onClick={() => setActiveTab('annual')} className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${activeTab === 'annual' ? 'bg-green-600 text-white' : 'text-gray-300 hover:bg-green-800'}`}>Anual</button>
                  </div>
             </div>
             {renderContent()}
@@ -111,26 +115,49 @@ const DashboardPage: React.FC = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title="Estado do Caixa" value="Aberto" status="Desde 08:00" statusColor="text-green-400" />
-                <StatCard title="Contas a Pagar" value="R$ 1.250,00" status="3 vencendo hoje" statusColor="text-yellow-400"/>
-                <StatCard title="Contas a Receber" value="R$ 3.800,00" status="5 a receber hoje" statusColor="text-green-400" />
-                <StatCard title="Lucro do Mês" value="R$ 4.500,00" status="+15% vs Mês Anterior" />
+                <StatCard 
+                    title="Estado do Caixa" 
+                    value="Aberto" 
+                    status="Desde 08:00" 
+                    statusColor="text-green-400" 
+                    icon={<ArchiveIcon className="w-6 h-6 text-green-400" />} 
+                />
+                <StatCard 
+                    title="Contas a Pagar" 
+                    value="R$ 1.250,00" 
+                    status="3 vencendo hoje" 
+                    statusColor="text-yellow-400"
+                    icon={<TrendingDownIcon className="w-6 h-6 text-yellow-400" />}
+                />
+                <StatCard 
+                    title="Contas a Receber" 
+                    value="R$ 3.800,00" 
+                    status="5 a receber hoje" 
+                    statusColor="text-green-400" 
+                    icon={<TrendingUpIcon className="w-6 h-6 text-green-400" />}
+                />
+                <StatCard 
+                    title="Lucro do Mês" 
+                    value="R$ 4.500,00" 
+                    status="+15% vs Mês Anterior" 
+                    icon={<TrendingUpIcon className="w-6 h-6 text-green-400" />}
+                />
             </div>
 
             {/* Main Chart and Lists */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Annual Revenue Chart */}
-                <div className="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
+                <div className="lg:col-span-2 bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                     <h3 className="text-lg font-semibold text-white mb-4">Resumo do Faturamento Anual</h3>
                     <div style={{ width: '100%', height: 300 }}>
                         <ResponsiveContainer>
                             <BarChart data={annualData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
-                                <XAxis dataKey="name" stroke="#A0AEC0" />
-                                <YAxis stroke="#A0AEC0" />
-                                <Tooltip contentStyle={{ backgroundColor: '#2D3748', border: '1px solid #4A5568' }} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#166534" />
+                                <XAxis dataKey="name" stroke="#6EE7B7" />
+                                <YAxis stroke="#6EE7B7" />
+                                <Tooltip contentStyle={{ backgroundColor: '#064E3B', border: '1px solid #166534' }} />
                                 <Legend />
-                                <Bar dataKey="faturamento" fill="#6366F1" />
+                                <Bar dataKey="faturamento" fill="#4ADE80" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -138,24 +165,24 @@ const DashboardPage: React.FC = () => {
 
                 {/* Side Lists */}
                 <div className="space-y-6">
-                     <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
+                     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                         <h3 className="text-lg font-semibold text-white mb-4">Top 10 Produtos Mais Vendidos</h3>
                         <ul className="space-y-3">
                             {topProducts.map((p, i) => (
                                 <li key={i} className="flex justify-between items-center text-sm">
                                     <span className="text-gray-300">{p.name}</span>
-                                    <span className="font-semibold text-indigo-400">{p.sales} vendas</span>
+                                    <span className="font-semibold text-green-400">{p.sales} vendas</span>
                                 </li>
                             ))}
                         </ul>
                     </div>
-                     <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-gray-700">
+                     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                         <h3 className="text-lg font-semibold text-white mb-4">Top 10 Clientes Mais Ativos</h3>
                         <ul className="space-y-3">
                             {topClients.map((c, i) => (
                                 <li key={i} className="flex justify-between items-center text-sm">
                                     <span className="text-gray-300">{c.name}</span>
-                                    <span className="font-semibold text-indigo-400">{c.value}</span>
+                                    <span className="font-semibold text-green-400">{c.value}</span>
                                 </li>
                             ))}
                         </ul>
@@ -165,11 +192,23 @@ const DashboardPage: React.FC = () => {
             
             <SalesSummary />
 
-             {/* Sales Summary */}
+             {/* Sales Categories */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 <StatCard title="Revenda de Produtos" value="R$ 12.345,67" />
-                 <StatCard title="Produtos Industrializados" value="R$ 5.432,10" />
-                 <StatCard title="Serviços Prestados" value="R$ 8.765,43" />
+                 <StatCard 
+                    title="Revenda de Produtos" 
+                    value="R$ 12.345,67" 
+                    icon={<ArrowRightLeftIcon className="w-6 h-6 text-green-400" />} 
+                />
+                 <StatCard 
+                    title="Produtos Industrializados" 
+                    value="R$ 5.432,10" 
+                    icon={<FactoryIcon className="w-6 h-6 text-green-400" />} 
+                />
+                 <StatCard 
+                    title="Serviços Prestados" 
+                    value="R$ 8.765,43" 
+                    icon={<WrenchIcon className="w-6 h-6 text-green-400" />} 
+                />
             </div>
         </div>
     );

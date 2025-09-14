@@ -73,7 +73,8 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                                     <Route path="/dashboard" element={<DashboardPage />} />
                                     <Route path="/funcionarios" element={<EmployeesPage />} />
-                                    <Route path="/clientes" e_lement={<CustomersPage />} />
+                                    {/* FIX: Corrected typo from `e_lement` to `element` */}
+                                    <Route path="/clientes" element={<CustomersPage />} />
                                     <Route path="/pdv" element={<PdvPage />} />
                                     <Route path="/produtos" element={<ProductsPage />} />
                                     <Route path="/financeiro" element={<FinancialPage />} />
