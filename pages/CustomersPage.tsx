@@ -119,18 +119,27 @@ const CustomerModal: React.FC<{
                     <h2 className="text-2xl font-bold text-white mb-6">{customerToEdit ? 'Editar Cliente' : 'Adicionar Novo Cliente'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         
-                        <div>
-                            <label htmlFor="type" className="block text-sm font-medium text-gray-300">Tipo de Cliente</label>
-                            <select
-                                id="type"
-                                name="type"
-                                value={customer.type}
-                                onChange={handleChange}
-                                className="mt-1 block w-full pl-3 pr-10 py-2 bg-green-800 border border-green-700 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 text-white"
-                            >
-                                <option value={CustomerType.INDIVIDUAL}>Pessoa Física</option>
-                                <option value={CustomerType.COMPANY}>Pessoa Jurídica</option>
-                            </select>
+                        <div className="border-b border-green-800">
+                            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                <button
+                                    type="button"
+                                    onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.INDIVIDUAL }))}
+                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                                        customer.type === CustomerType.INDIVIDUAL ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'
+                                    }`}
+                                >
+                                    Pessoa Física
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.COMPANY }))}
+                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                                        customer.type === CustomerType.COMPANY ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'
+                                    }`}
+                                >
+                                    Pessoa Jurídica
+                                </button>
+                            </nav>
                         </div>
                         
                         {/* Conditional Fields */}
