@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../App';
+import { useAuth, useCompany } from '../App';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon
@@ -21,12 +21,17 @@ const navItems = [
 ];
 
 const Sidebar: React.FC = () => {
-    const location = useLocation();
+    const { logo } = useCompany();
 
     return (
         <aside className="w-64 bg-green-950 text-gray-300 flex flex-col border-r border-green-800">
-            <div className="h-16 flex items-center justify-center border-b border-green-800">
+            <div className="pt-4 pb-2 border-b border-green-800 text-center">
                 <h1 className="text-xl font-bold text-white">Declara Mei Express</h1>
+                {logo && (
+                    <div className="px-4 py-4">
+                        <img src={logo} alt="Logo da Empresa" className="max-w-full h-auto mx-auto my-2 rounded-md max-h-56" />
+                    </div>
+                )}
             </div>
             <nav className="flex-1 px-4 py-6 space-y-2">
                 {navItems.map(item => (

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useCompany } from '../App';
 
 const FormSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
@@ -22,11 +23,47 @@ const FormField: React.FC<{ label: string; value: string }> = ({ label, value })
 );
 
 const CompanyPage: React.FC = () => {
+    const { logo, setLogo } = useCompany();
+
+    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setLogo(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-white">Dados da Empresa</h1>
             
             <form className="space-y-6">
+                 <FormSection title="Logo da Empresa">
+                    <div className="col-span-1 md:col-span-2 flex flex-col items-center gap-4">
+                        {logo ? (
+                            <img src={logo} alt="Logo da Empresa" className="h-24 w-auto bg-green-800 p-2 rounded-md" />
+                        ) : (
+                            <div className="h-24 w-48 flex items-center justify-center bg-green-800 rounded-md text-gray-400">
+                                Sem logo
+                            </div>
+                        )}
+                        <label htmlFor="logo-upload" className="cursor-pointer bg-green-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600">
+                            Adicionar logo da Empresa
+                        </label>
+                        <input
+                            id="logo-upload"
+                            type="file"
+                            className="hidden"
+                            accept="image/jpeg, image/png, image/svg+xml"
+                            onChange={handleLogoChange}
+                        />
+                         <p className="text-xs text-gray-500">Formatos aceitos: jpeg, png, svg</p>
+                    </div>
+                </FormSection>
+
                 <FormSection title="Dados Cadastrais">
                     <FormField label="Nome da Empresa" value="Minha Empresa MEI" />
                     <FormField label="Empreendedor" value="João Protásio Jr." />
