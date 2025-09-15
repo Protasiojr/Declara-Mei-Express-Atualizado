@@ -51,7 +51,7 @@ const Sidebar: React.FC<{ isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boo
                         </div>
                     )}
                 </div>
-                <nav className="flex-1 px-4 py-6 space-y-2">
+                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                     {navItems.map(item => (
                         <NavLink
                             key={item.path}
