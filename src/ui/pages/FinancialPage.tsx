@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { PlusCircleIcon } from '../components/icons';
+// FIX: Imports will now work after adding exports to mocks file.
 import { mockPayables, mockReceivables } from '../../data/mocks';
 
 const FinancialPage: React.FC = () => {
@@ -60,8 +62,9 @@ const PayablesTable: React.FC = () => (
         <tbody>
             {mockPayables.map(p => (
                 <tr key={p.id} className="border-b border-green-800 hover:bg-green-700">
-                    <td className="px-6 py-4 text-white">{p.desc}</td><td className="px-6 py-4">{p.value}</td>
-                    <td className="px-6 py-4">{p.due}</td>
+                    {/* FIX: Corrected property names to match Payable type and added formatting. */}
+                    <td className="px-6 py-4 text-white">{p.description}</td><td className="px-6 py-4">R$ {p.value.toFixed(2)}</td>
+                    <td className="px-6 py-4">{p.dueDate}</td>
                     <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${p.paid ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
                             {p.paid ? 'Pago' : 'Pendente'}
@@ -89,8 +92,9 @@ const ReceivablesTable: React.FC = () => (
         <tbody>
             {mockReceivables.map(r => (
                 <tr key={r.id} className="border-b border-green-800 hover:bg-green-700">
-                    <td className="px-6 py-4 text-white">{r.desc}</td><td className="px-6 py-4">{r.value}</td>
-                    <td className="px-6 py-4">{r.due}</td>
+                    {/* FIX: Corrected property names to match Receivable type and added formatting. */}
+                    <td className="px-6 py-4 text-white">{r.description}</td><td className="px-6 py-4">R$ {r.value.toFixed(2)}</td>
+                    <td className="px-6 py-4">{r.dueDate}</td>
                     <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${r.received ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
                             {r.received ? 'Recebido' : 'A receber'}

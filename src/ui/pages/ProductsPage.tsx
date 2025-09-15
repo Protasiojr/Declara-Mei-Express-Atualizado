@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { PlusCircleIcon } from '../components/icons';
+// FIX: Imports will now work after adding exports to mocks file.
 import { mockProducts, mockServices } from '../../data/mocks';
 
 
@@ -61,7 +63,8 @@ const ProductsTable: React.FC = () => (
                 <tr key={p.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
                     <td className="px-6 py-4 font-medium text-white">{p.name}</td>
                     <td className="px-6 py-4">{p.category}</td>
-                    <td className="px-6 py-4">{p.price}</td>
+                    {/* FIX: Changed p.price to p.sellPrice and added formatting. */}
+                    <td className="px-6 py-4">R$ {p.sellPrice.toFixed(2)}</td>
                     <td className="px-6 py-4">{p.stock}</td>
                     <td className="px-6 py-4 space-x-2">
                         <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
@@ -86,7 +89,8 @@ const ServicesTable: React.FC = () => (
             {mockServices.map(s => (
                 <tr key={s.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
                     <td className="px-6 py-4 font-medium text-white">{s.name}</td>
-                    <td className="px-6 py-4">{s.price}</td>
+                    {/* FIX: Added currency formatting. */}
+                    <td className="px-6 py-4">R$ {s.price.toFixed(2)}</td>
                     <td className="px-6 py-4 space-x-2">
                         <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
                         <a href="#" className="font-medium text-red-400 hover:underline">Excluir</a>

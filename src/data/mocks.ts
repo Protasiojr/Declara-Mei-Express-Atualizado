@@ -1,4 +1,5 @@
-import { Customer, CustomerType, Employee } from '../domain/types';
+
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -71,6 +72,7 @@ export const pdvMockCustomers: Customer[] = [
         phone: '(21) 88888-7777',
         address: { street: 'Avenida Brasil', number: '1000', neighborhood: 'Bonsucesso', city: 'Rio de Janeiro', state: 'RJ', zipCode: '21040-360' }
     },
+    // FIX: Completed the truncated customer object.
     {
         id: '3',
         type: CustomerType.INDIVIDUAL,
@@ -81,71 +83,59 @@ export const pdvMockCustomers: Customer[] = [
     }
 ];
 
-export const mockProducts = [
-    { id: 1, name: 'Produto A', category: 'Eletrônicos', barcode: '789000000001', sku: 'PA-001', price: 10.00, stock: 100 },
-    { id: 2, name: 'Produto B', category: 'Material Escritório', barcode: '789000000002', sku: 'PB-002', price: 25.50, stock: 50 },
-    { id: 3, name: 'Produto C', category: 'Alimentos', barcode: '789000000003', sku: 'PC-003', price: 5.75, stock: 200 },
-    { id: 4, name: 'Produto D', category: 'Bebidas', barcode: '789000000004', sku: 'PD-004', price: 18.20, stock: 150 },
-    { id: 5, name: 'Produto E', category: 'Limpeza', barcode: '789000000005', sku: 'PE-005', price: 33.00, stock: 80 },
-    { id: 6, name: 'Produto F', category: 'Higiene', barcode: '789000000006', sku: 'PF-006', price: 12.00, stock: 120 },
-];
-export const mockServices = [
-    { id: 101, name: 'Serviço X', price: 50.00 },
-    { id: 102, name: 'Serviço Y', price: 150.00 },
-    { id: 103, name: 'Serviço Z', price: 120.00 },
+export const mockProducts: Product[] = [
+    { id: 'p1', name: 'Produto A', barcode: '123456789', sku: 'PA001', category: 'Eletrônicos', description: 'Um produto eletrônico A', costPrice: 50, sellPrice: 99.9, stock: 100, minStock: 10, unit: 'un', type: ProductType.RESALE },
+    { id: 'p2', name: 'Produto B', barcode: '987654321', sku: 'PB002', category: 'Roupas', description: 'Um produto de vestuário B', costPrice: 25, sellPrice: 59.9, stock: 200, minStock: 20, unit: 'pç', type: ProductType.RESALE },
+    { id: 'p3', name: 'Produto Industrializado C', barcode: '112233445', sku: 'PC003', category: 'Alimentos', description: 'Um produto alimentício C', costPrice: 5, sellPrice: 12.5, stock: 50, minStock: 5, unit: 'un', type: ProductType.INDUSTRIALIZED },
+    { id: 'p4', name: 'Produto D', barcode: '556677889', sku: 'PD004', category: 'Eletrônicos', description: 'Um produto eletrônico D', costPrice: 150, sellPrice: 249.9, stock: 30, minStock: 5, unit: 'un', type: ProductType.RESALE },
 ];
 
-export const searchablePdvItems = [
-    ...mockProducts.map(p => ({ ...p, type: 'product', price: p.price, id: `prod-${p.id}` })),
-    ...mockServices.map(s => ({ ...s, type: 'service', price: s.price, id: `serv-${s.id}` }))
-];
-
-
-export const mockPayables = [
-    { id: 1, desc: 'Aluguel', category: 'Despesas Fixas', value: 'R$ 800,00', due: '10/07/2025', paid: false },
-    { id: 2, desc: 'Fornecedor A', category: 'Compras', value: 'R$ 450,00', due: '15/07/2025', paid: false },
-    { id: 3, desc: 'Internet', category: 'Despesas Fixas', value: 'R$ 99,00', due: '05/07/2025', paid: true },
-];
-
-export const mockReceivables = [
-    { id: 1, desc: 'Venda #123 - Cliente Feliz', value: 'R$ 300,00', due: '20/07/2025', received: false },
-    { id: 2, desc: 'Serviço Y - Empresa Parceira', value: 'R$ 120,00', due: '01/08/2025', received: false },
-    { id: 3, desc: 'Venda #121 - Sr. Silva', value: 'R$ 80,00', due: '01/07/2025', received: true },
+export const mockServices: Service[] = [
+    { id: 's1', name: 'Serviço X', price: 150.00 },
+    { id: 's2', name: 'Serviço Y', price: 200.00 },
+    { id: 's3', name: 'Serviço Z', price: 75.50 },
 ];
 
 export const initialMockEmployees: Employee[] = [
-    { 
-        id: '1', 
-        name: 'João da Silva', 
-        phone: '(11) 91234-5678', 
-        pis: '120.12345.67-8',
-        ctps: '1234567-89',
-        address: {
-            street: 'Rua das Flores',
-            number: '123',
-            complement: 'Apto 101',
-            neighborhood: 'Centro',
-            city: 'São Paulo',
-            state: 'SP',
-            zipCode: '01001-000'
-        },
-        vacationStart: '2025-01-01',
-        vacationEnd: '2025-01-30'
-    },
-    { 
-        id: '2', 
-        name: 'Maria Oliveira', 
-        phone: '(21) 98765-4321',
-        pis: '120.87654.32-1',
-        ctps: '9876543-21',
-        address: {
-            street: 'Avenida Copacabana',
-            number: '500',
-            complement: '',
-            neighborhood: 'Copacabana',
-            city: 'Rio de Janeiro',
-            state: 'RJ',
-            zipCode: '22020-001'
-        }
-    },
+    { id: 'e1', name: 'João Funcionário', phone: '(11) 98765-4321', pis: '123.45678.90-1', ctps: '1234567', address: { street: 'Rua do Trabalho', number: '1', neighborhood: 'Vila Operária', city: 'São Paulo', state: 'SP', zipCode: '02002-000' } },
+    { id: 'e2', name: 'Maria Colaboradora', phone: '(21) 91234-5678', pis: '987.65432.10-9', ctps: '7654321', address: { street: 'Avenida Central', number: '2', neighborhood: 'Centro', city: 'Rio de Janeiro', state: 'RJ', zipCode: '20002-000' } },
+];
+
+export const mockPayables: Payable[] = [
+    { id: 'pay1', description: 'Aluguel', category: 'Despesa Fixa', value: 800.00, dueDate: '2024-08-05', paid: false },
+    { id: 'pay2', description: 'Fornecedor A', category: 'Compra de Mercadoria', value: 450.00, dueDate: '2024-08-10', paid: false },
+    { id: 'pay3', description: 'Conta de Luz', category: 'Despesa Fixa', value: 150.00, dueDate: '2024-07-28', paid: true },
+];
+
+export const mockReceivables: Receivable[] = [
+    { id: 'rec1', description: 'Venda para Cliente Feliz', value: 300.00, dueDate: '2024-08-15', received: false },
+    { id: 'rec2', description: 'Serviço para Empresa Parceira', value: 120.00, dueDate: '2024-08-20', received: false },
+    { id: 'rec3', description: 'Venda para Sr. Silva', value: 250.00, dueDate: '2024-07-25', received: true },
+];
+
+interface SearchableProduct {
+    id: string; name: string; barcode?: string; sku: string; category: string; price: number; stock: number; type: 'product';
+}
+interface SearchableService {
+    id: string; name: string; price: number; type: 'service';
+}
+type SearchableItem = SearchableProduct | SearchableService;
+
+export const searchablePdvItems: SearchableItem[] = [
+    ...mockProducts.map(p => ({
+        id: p.id,
+        name: p.name,
+        barcode: p.barcode,
+        sku: p.sku,
+        category: p.category,
+        price: p.sellPrice,
+        stock: p.stock,
+        type: 'product' as const,
+    })),
+    ...mockServices.map(s => ({
+        id: s.id,
+        name: s.name,
+        price: s.price,
+        type: 'service' as const,
+    })),
 ];

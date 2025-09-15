@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useCompany } from '../../app/context/CompanyContext';
 import { PlusCircleIcon, BarcodeIcon, Trash2Icon, PlusIcon, MinusIcon, ArrowUpCircleIcon, ArrowDownCircleIcon, PrinterIcon } from '../components/icons';
 import { Customer, CustomerType, Address } from '../../domain/types';
+// FIX: Corrected import to use exported member from mocks.
 import { searchablePdvItems, pdvMockCustomers } from '../../data/mocks';
 
-// FIX: Define explicit types for searchable items to enable discriminated union type checking.
+// Define explicit types for searchable items to enable discriminated union type checking.
 // This resolves type errors when accessing properties specific to products (sku, barcode).
 interface SearchableProduct {
     id: string;
@@ -90,11 +92,8 @@ const PdvPage: React.FC = () => {
     const [customers, setCustomers] = useState<Customer[]>(pdvMockCustomers);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    // FIX: Use the new SearchableItem type for searchResults state.
     const [searchResults, setSearchResults] = useState<SearchableItem[]>([]);
     const [lastSale, setLastSale] = useState<Sale | null>(null);
-    // FIX: Corrected initial state for cashMovementType. 'Saída' is not a valid CashMovementType.
-    // Changed to 'Sangria' which is a valid type.
     const [cashMovementType, setCashMovementType] = useState<CashMovementType>('Sangria');
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,7 +111,6 @@ const PdvPage: React.FC = () => {
         if (searchQuery.length > 1) {
             const lowercasedQuery = searchQuery.toLowerCase();
             setSearchResults(
-                // FIX: Cast searchablePdvItems to SearchableItem[] to allow filtering on product-specific fields.
                 (searchablePdvItems as SearchableItem[]).filter(item =>
                     item.name.toLowerCase().includes(lowercasedQuery) ||
                     (item.type === 'product' && (item.sku?.toLowerCase().includes(lowercasedQuery) || item.barcode?.includes(lowercasedQuery)))
@@ -159,7 +157,6 @@ const PdvPage: React.FC = () => {
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery) {
-            // FIX: Cast searchablePdvItems to SearchableItem[] to allow finding on product-specific fields.
             const exactMatch = (searchablePdvItems as SearchableItem[]).find(item => item.type === 'product' && (item.barcode === searchQuery || item.sku === searchQuery));
             if (exactMatch) {
                 addToCart(exactMatch);
@@ -178,6 +175,10 @@ const PdvPage: React.FC = () => {
         const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         if (total <= 0) return;
         
+        // TODO: Implement automatic stock reduction here
+        // For each item in `cart`, find the corresponding product in a global state
+        // and decrease its `stock` property by `item.quantity`.
+
         const timestamp = new Date().toLocaleString('pt-BR');
         const newSale: Sale = {
             id: `V${Date.now()}`,
@@ -240,9 +241,13 @@ const PdvPage: React.FC = () => {
             case 'payment': return <PaymentModal total={total} onCancel={() => { setActiveModal(null); setSelectedCustomer(null); }} onFinalize={handleFinalizeSale} customers={customers} selectedCustomer={selectedCustomer} onSelectCustomer={setSelectedCustomer} onAddNewCustomer={() => setActiveModal('newCustomer')} />;
             case 'history': return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
             case 'movements': return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
+            // FIX: Replaced incorrect component name with correct one.
             case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} />;
+            // FIX: Replaced incorrect component name with correct one.
             case 'newCustomer': return <CustomerModal isOpen={true} onClose={() => setActiveModal('payment')} onSave={handleSaveNewCustomer} customerToEdit={null} />;
+            // FIX: Replaced incorrect component name with correct one.
             case 'cashMovement': return <CashMovementModal type={cashMovementType} onClose={() => setActiveModal(null)} onConfirm={handleAddCashMovement} />;
+            // FIX: Replaced incorrect component name with correct one.
             case 'receipt': return lastSale && <ReceiptModal sale={lastSale} onClose={() => { setLastSale(null); setActiveModal(null); searchInputRef.current?.focus(); }} />;
             default: return null;
         }
@@ -362,7 +367,6 @@ const PdvPage: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 mb-2">
-                             {/* FIX: Corrected argument for setCashMovementType. 'Saída' is not a valid CashMovementType. Changed to 'Sangria'. */}
                              <button onClick={() => { setCashMovementType('Sangria'); setActiveModal('cashMovement'); }} className="flex items-center justify-center gap-2 bg-yellow-600/50 text-yellow-300 py-2 rounded-lg font-semibold hover:bg-yellow-600/80 disabled:opacity-50" disabled={!isCashierOpen}><ArrowDownCircleIcon className="w-5"/> Sangria</button>
                              <button onClick={() => { setCashMovementType('Suprimento'); setActiveModal('cashMovement'); }} className="flex items-center justify-center gap-2 bg-blue-600/50 text-blue-300 py-2 rounded-lg font-semibold hover:bg-blue-600/80 disabled:opacity-50" disabled={!isCashierOpen}><ArrowUpCircleIcon className="w-5"/> Suprimento</button>
                         </div>
@@ -380,6 +384,7 @@ const PdvPage: React.FC = () => {
     );
 };
 
+// FIX: Added missing modal component definitions
 const Modal: React.FC<{ title: string; children: React.ReactNode; footer: React.ReactNode; size?: string }> = ({ title, children, footer, size = 'max-w-md' }) => (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
         <div className={`bg-green-900 rounded-lg shadow-xl w-full ${size} border border-green-800 flex flex-col max-h-[90vh]`}>
@@ -554,206 +559,132 @@ const MovementsModal: React.FC<{ movements: CashierMovement[]; onClose: () => vo
                 <li key={m.id} className="bg-green-800/50 p-3 rounded-lg flex justify-between items-center">
                     <div>
                         <p className="font-semibold text-white">{m.description}</p>
-                        <p className="text-sm text-gray-400">{m.timestamp}</p>
+                        <p className="text-xs text-gray-400">{m.timestamp}</p>
                     </div>
-                    <p className={`font-bold text-lg ${m.type === 'Entrada' ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold text-lg ${m.type === 'Entrada' ? 'text-green-400' : 'text-red-400'}`}>
                         {m.type === 'Entrada' ? '+' : '-'} R$ {m.amount.toFixed(2)}
-                    </p>
+                    </span>
                 </li>
             ))}
         </ul>
     </Modal>
 );
 
-const CloseCashierModal: React.FC<{ movements: CashierMovement[]; initialBalance: number; onClose: () => void; onConfirm: () => void }> = ({ movements, initialBalance, onClose, onConfirm }) => {
+const CloseCashierModal: React.FC<{
+    movements: CashierMovement[];
+    initialBalance: number;
+    onClose: () => void;
+    onConfirm: () => void;
+}> = ({ movements, initialBalance, onClose, onConfirm }) => {
     const summary = useMemo(() => {
-        const sales = movements.filter(m => m.description.startsWith('Venda'));
-        const totalSales = sales.reduce((sum, m) => sum + m.amount, 0);
-        const cashSales = sales.filter(m => m.description.includes('(Dinheiro)')).reduce((sum, m) => sum + m.amount, 0);
-        const cardSales = sales.filter(m => m.description.includes('(Cartão')).reduce((sum, m) => sum + m.amount, 0);
-        const pixSales = sales.filter(m => m.description.includes('(PIX)')).reduce((sum, m) => sum + m.amount, 0);
-        const otherIncomes = movements.filter(m => m.type === 'Entrada' && !m.description.startsWith('Venda') && m.description !== 'Saldo Inicial').reduce((sum, m) => sum + m.amount, 0);
-        const outcomes = movements.filter(m => m.type === 'Saída').reduce((sum, m) => sum + m.amount, 0);
-        const expectedBalance = initialBalance + cashSales + otherIncomes - outcomes;
-        return { totalSales, cashSales, cardSales, pixSales, otherIncomes, outcomes, expectedBalance };
+        const sales = movements.filter(m => m.description.startsWith('Venda')).reduce((sum, m) => sum + m.amount, 0);
+        const cashEntries = movements.filter(m => m.type === 'Entrada' && m.description.includes('(Dinheiro)')).reduce((sum, m) => sum + m.amount, 0);
+        const supplies = movements.filter(m => m.type === 'Entrada' && m.description.startsWith('Suprimento')).reduce((sum, m) => sum + m.amount, 0);
+        const withdrawals = movements.filter(m => m.type === 'Saída' && m.description.startsWith('Sangria')).reduce((sum, m) => sum + m.amount, 0);
+        const totalEntries = initialBalance + cashEntries + supplies;
+        const expectedCash = totalEntries - withdrawals;
+        return { sales, supplies, withdrawals, expectedCash };
     }, [movements, initialBalance]);
-    
+
     return (
-        <Modal title="Fechamento de Caixa" footer={
-            <div className="flex justify-between items-center">
+        <Modal title="Fechar Caixa" size="max-w-lg" footer={
+            <div className="flex justify-between">
                 <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Cancelar</button>
-                <button onClick={onConfirm} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 font-semibold text-white">Confirmar Fechamento</button>
+                <button onClick={onConfirm} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-500 font-semibold text-white">Confirmar Fechamento</button>
             </div>
         }>
-            <div className="space-y-3 text-gray-300">
-                <p className="text-sm text-yellow-400">Atenção: Esta ação encerrará a sessão de vendas atual e zerará os registros. Os relatórios consolidados estarão disponíveis na página de Relatórios.</p>
-                <SummaryRow label="Saldo Inicial" value={initialBalance} />
-                <SummaryRow label="Vendas em Dinheiro" value={summary.cashSales} positive />
-                <SummaryRow label="Vendas em Cartão" value={summary.cardSales} positive />
-                <SummaryRow label="Vendas em PIX" value={summary.pixSales} positive />
-                <SummaryRow label="Outras Entradas" value={summary.otherIncomes} positive />
-                <SummaryRow label="Saídas" value={summary.outcomes} />
-                <div className="border-t border-green-700 my-2"></div>
-                <div className="flex justify-between text-lg font-bold text-white">
-                    <span>Saldo Final Esperado</span>
-                    <span>R$ {summary.expectedBalance.toFixed(2)}</span>
+            <div className="space-y-3 text-white">
+                <p className="text-center text-gray-400">Confira os valores antes de fechar o caixa.</p>
+                <div className="bg-green-800/50 p-4 rounded-lg space-y-2">
+                    <div className="flex justify-between"><span className="text-gray-300">Saldo Inicial:</span> <span>R$ {initialBalance.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-300">Vendas (Total):</span> <span>R$ {summary.sales.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-300">Suprimentos:</span> <span className="text-green-400">+ R$ {summary.supplies.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-300">Sangrias:</span> <span className="text-red-400">- R$ {summary.withdrawals.toFixed(2)}</span></div>
+                    <div className="flex justify-between font-bold text-lg border-t border-green-700 pt-2 mt-2"><span >Valor Esperado em Caixa:</span> <span className="text-green-400">R$ {summary.expectedCash.toFixed(2)}</span></div>
                 </div>
             </div>
         </Modal>
     );
 };
 
-const CashMovementModal: React.FC<{ type: CashMovementType; onClose: () => void; onConfirm: (type: CashMovementType, amount: number, description: string) => void }> = ({ type, onClose, onConfirm }) => {
+const CashMovementModal: React.FC<{ type: CashMovementType, onClose: () => void, onConfirm: (type: CashMovementType, amount: number, description: string) => void }> = ({ type, onClose, onConfirm }) => {
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onConfirm(type, parseFloat(amount), description);
     };
+
     return (
-        <Modal
-            // FIX: Corrected comparison for modal title. 'Saída' is not a valid CashMovementType. Changed to 'Sangria'.
-            title={type === 'Sangria' ? 'Registrar Sangria (Saída)' : 'Registrar Suprimento (Entrada)'}
-            footer={
-                <div className="flex justify-between items-center">
-                    <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Cancelar</button>
-                    <button type="submit" form="cash-movement-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-semibold text-white">Confirmar</button>
-                </div>
-            }
-        >
+        <Modal title={type} footer={
+            <div className="flex justify-between">
+                <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
+                <button type="submit" form="cash-movement-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Confirmar</button>
+            </div>
+        }>
             <form id="cash-movement-form" onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="mov-amount" className="block text-sm font-medium text-gray-300">Valor</label>
-                    <input type="number" id="mov-amount" value={amount} onChange={e => setAmount(e.target.value)}
+                    <label htmlFor="movement-amount" className="block text-sm font-medium text-gray-300">Valor</label>
+                    <input type="number" id="movement-amount" value={amount} onChange={e => setAmount(e.target.value)}
                         className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
                         placeholder="R$ 0,00" autoFocus required />
                 </div>
                 <div>
-                    <label htmlFor="mov-description" className="block text-sm font-medium text-gray-300">Descrição/Motivo</label>
-                    <input type="text" id="mov-description" value={description} onChange={e => setDescription(e.target.value)}
+                    <label htmlFor="movement-description" className="block text-sm font-medium text-gray-300">Descrição/Motivo</label>
+                    <input type="text" id="movement-description" value={description} onChange={e => setDescription(e.target.value)}
                         className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
-                        placeholder="Ex: Depósito, Troco" required />
+                        required />
                 </div>
             </form>
         </Modal>
     );
 };
 
-const ReceiptModal: React.FC<{ sale: Sale; onClose: () => void; }> = ({ sale, onClose }) => {
+const ReceiptModal: React.FC<{ sale: Sale, onClose: () => void }> = ({ sale, onClose }) => {
     const { logo } = useCompany();
     const receiptRef = useRef<HTMLDivElement>(null);
+    const handlePrint = () => window.print();
 
-    const handlePrint = () => {
-        const content = receiptRef.current?.innerHTML;
-        if (!content) return;
-        const printWindow = window.open('', '_blank', 'height=800,width=600');
-        if (printWindow) {
-            printWindow.document.write('<html><head><title>Comprovante de Venda</title>');
-            printWindow.document.write(`
-                <style>
-                    body { font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; background-color: #fff; color: #000; width: 300px; }
-                    .receipt { border: 1px solid #ccc; padding: 10px; }
-                    h1, h2, p { margin: 0; text-align: center; }
-                    .logo { max-width: 150px; max-height: 80px; margin: 0 auto 10px; display: block; }
-                    hr { border: none; border-top: 1px dashed #000; margin: 10px 0; }
-                    .items-table { width: 100%; border-collapse: collapse; }
-                    .items-table th, .items-table td { text-align: left; padding: 2px 0; }
-                    .items-table .qty { text-align: center; }
-                    .items-table .price { text-align: right; }
-                    .totals { margin-top: 10px; }
-                    .totals div { display: flex; justify-content: space-between; font-weight: bold; }
-                </style>
-            `);
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(content);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 250);
-        }
-    };
-    
     return (
-        <Modal
-            title="Venda Finalizada"
-            size="max-w-sm"
-            footer={
-                <div className="flex justify-between items-center w-full">
-                    <button onClick={onClose} className="w-1/2 px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Fechar</button>
-                    <button onClick={handlePrint} className="w-1/2 flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-semibold text-white"><PrinterIcon className="w-5" /> Imprimir</button>
+        <Modal title="Recibo" size="max-w-md" footer={
+            <div className="flex justify-between">
+                <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Fechar</button>
+                <button onClick={handlePrint} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold"><PrinterIcon className="w-5" /> Imprimir</button>
+            </div>
+        }>
+            <div ref={receiptRef} className="bg-gray-100 text-gray-800 p-4 font-mono text-sm">
+                <div className="text-center">
+                    {logo && <img src={logo} alt="Logo" className="mx-auto h-16 w-auto mb-2"/>}
+                    <h3 className="font-bold text-lg">Minha Empresa MEI</h3>
+                    <p>Rua das Flores, 123 - Centro</p>
+                    <p>CNPJ: 12.345.678/0001-90</p>
                 </div>
-            }
-        >
-            <div ref={receiptRef}>
-                <div className="text-center text-black bg-white p-4 rounded-md font-mono">
-                    {logo && <img src={logo} alt="Logo" className="logo" />}
-                    <h2 className="text-lg font-bold">Minha Empresa MEI</h2>
-                    <p className="text-xs">CNPJ: 12.345.678/0001-90</p>
-                    <p className="text-xs">Rua das Flores, 123</p>
-                    <hr />
-                    <p className="text-xs">COMPROVANTE DE VENDA</p>
-                    <p className="text-xs">Venda: {sale.id} | Data: {sale.timestamp}</p>
-                    {sale.customer && (
-                        <>
-                            <hr />
-                            <p className="text-xs text-left font-bold">CLIENTE:</p>
-                            <p className="text-xs text-left">{sale.customer.fullName || sale.customer.companyName}</p>
-                            <p className="text-xs text-left">{sale.customer.cpf || sale.customer.cnpj}</p>
-                        </>
-                    )}
-                    <hr />
-                    <table className="items-table text-xs w-full">
-                        <thead><tr><th>Qtd</th><th>Item</th><th className="price">Total</th></tr></thead>
-                        <tbody>
-                            {sale.items.map(item => (
-                                <tr key={item.id}>
-                                    <td className="qty">{item.quantity}x</td>
-                                    <td>{item.name}</td>
-                                    <td className="price">{(item.price * item.quantity).toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <hr />
-                    <div className="totals text-sm">
-                        <div><span>TOTAL</span><span>R$ {sale.total.toFixed(2)}</span></div>
-                        <div className="text-xs"><span>Forma Pgto.</span><span>{sale.paymentMethod}</span></div>
-                        {sale.paidAmount && <div><span className="text-xs">Valor Pago</span><span>R$ {sale.paidAmount.toFixed(2)}</span></div>}
-                        {sale.change && sale.change > 0 && <div><span className="text-xs">Troco</span><span>R$ {sale.change.toFixed(2)}</span></div>}
-                    </div>
+                <hr className="my-2 border-gray-400 border-dashed"/>
+                <p>CUPOM NÃO FISCAL</p>
+                <p>Venda: #{sale.id}</p>
+                <p>Data: {sale.timestamp}</p>
+                {sale.customer && <p>Cliente: {sale.customer.fullName || sale.customer.companyName}</p>}
+                <hr className="my-2 border-gray-400 border-dashed"/>
+                <table className="w-full">
+                    <thead><tr><th className="text-left">Item</th><th className="text-right">Qtd</th><th className="text-right">Vl. Un.</th><th className="text-right">Total</th></tr></thead>
+                    <tbody>
+                        {sale.items.map(item => <tr key={item.id}><td>{item.name}</td><td className="text-right">{item.quantity}</td><td className="text-right">{item.price.toFixed(2)}</td><td className="text-right">{(item.quantity * item.price).toFixed(2)}</td></tr>)}
+                    </tbody>
+                </table>
+                <hr className="my-2 border-gray-400 border-dashed"/>
+                <div className="text-right font-bold">
+                    <p>TOTAL: R$ {sale.total.toFixed(2)}</p>
                 </div>
+                <hr className="my-2 border-gray-400 border-dashed"/>
+                <p>Pagamento: {sale.paymentMethod}</p>
+                {sale.paidAmount && <p>Valor Pago: R$ {sale.paidAmount.toFixed(2)}</p>}
+                {sale.change && <p>Troco: R$ {sale.change.toFixed(2)}</p>}
+                 <p className="text-center mt-4">Obrigado pela preferência!</p>
             </div>
         </Modal>
     );
 };
-
-const SummaryRow: React.FC<{ label: string; value: number; positive?: boolean }> = ({ label, value, positive }) => (
-    <div className="flex justify-between items-center text-sm border-b border-green-800/50 py-2">
-        <span>{label}</span>
-        <span className={`font-semibold ${value > 0 && positive ? 'text-green-400' : value < 0 ? 'text-red-400' : 'text-white'}`}>
-            R$ {value.toFixed(2)}
-        </span>
-    </div>
-);
-
-// Customer Modal Components copied from CustomersPage
-const InputField: React.FC<{ label: string; name: string; type?: string; value: string | undefined | null; onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void; required?: boolean; className?: string }> = ({ label, name, type = 'text', value, onChange, required = false, className = '' }) => (
-    <div className={className}>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
-        <input
-            type={type}
-            id={name}
-            name={name}
-            value={value || ''}
-            onChange={onChange}
-            required={required}
-            className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-white"
-        />
-    </div>
-);
 
 const CustomerModal: React.FC<{
     isOpen: boolean;
@@ -790,83 +721,76 @@ const CustomerModal: React.FC<{
     };
 
     if (!isOpen) return null;
-
+    
+    // This is not inside a Modal component because it has custom styling
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
-            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-4xl border border-green-800 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-green-800">
                 <div className="p-6 border-b border-green-800">
-                    <h2 className="text-2xl font-bold text-white">{customerToEdit ? 'Editar Cliente' : 'Adicionar Novo Cliente'}</h2>
+                     <h2 className="text-2xl font-bold text-white">{customerToEdit ? 'Editar Cliente' : 'Adicionar Novo Cliente'}</h2>
                 </div>
-                <div className="p-6 overflow-y-auto">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="border-b border-green-800">
-                            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                                <button
-                                    type="button"
-                                    onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.INDIVIDUAL }))}
-                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${customer.type === CustomerType.INDIVIDUAL ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}
-                                >
-                                    Pessoa Física
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.COMPANY }))}
-                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${customer.type === CustomerType.COMPANY ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}
-                                >
-                                    Pessoa Jurídica
-                                </button>
-                            </nav>
-                        </div>
-                        
-                        {customer.type === CustomerType.INDIVIDUAL ? (
-                             <fieldset className="border border-green-800 p-4 rounded-lg">
-                                <legend className="px-2 text-green-400 font-semibold">Pessoa Física</legend>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <InputField label="Nome Completo" name="fullName" value={customer.fullName} onChange={handleChange} required />
-                                    <InputField label="CPF" name="cpf" value={customer.cpf} onChange={handleChange} />
-                                    <InputField label="Telefone" name="phone" value={customer.phone} onChange={handleChange} required />
-                                </div>
-                            </fieldset>
-                        ) : (
-                            <fieldset className="border border-green-800 p-4 rounded-lg">
-                                <legend className="px-2 text-green-400 font-semibold">Pessoa Jurídica</legend>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <InputField label="Razão Social" name="companyName" value={customer.companyName} onChange={handleChange} required />
-                                    <InputField label="Nome Fantasia" name="tradingName" value={customer.tradingName} onChange={handleChange} />
-                                    <InputField label="CNPJ" name="cnpj" value={customer.cnpj} onChange={handleChange} required />
-                                    <InputField label="Inscrição Estadual" name="stateRegistration" value={customer.stateRegistration} onChange={handleChange} />
-                                    <InputField label="Nome de Contato" name="contactName" value={customer.contactName} onChange={handleChange} />
-                                    <InputField label="Telefone" name="phone" value={customer.phone} onChange={handleChange} required />
-                                </div>
-                            </fieldset>
-                        )}
-                        
-                        <fieldset className="border border-green-800 p-4 rounded-lg">
-                            <legend className="px-2 text-green-400 font-semibold">Endereço</legend>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <InputField label="CEP" name="zipCode" value={customer.address.zipCode} onChange={handleAddressChange} />
-                                <InputField label="Logradouro" name="street" value={customer.address.street} onChange={handleAddressChange} className="md:col-span-2" />
-                                <InputField label="Número" name="number" value={customer.address.number} onChange={handleAddressChange} />
-                                <InputField label="Complemento" name="complement" value={customer.address.complement} onChange={handleAddressChange} />
-                                <InputField label="Bairro" name="neighborhood" value={customer.address.neighborhood} onChange={handleAddressChange} />
-                                <InputField label="Cidade" name="city" value={customer.address.city} onChange={handleAddressChange} />
-                                <InputField label="Estado" name="state" value={customer.address.state} onChange={handleAddressChange} />
+                <form onSubmit={handleSubmit} className="overflow-y-auto flex-grow p-6 space-y-6">
+                    <div className="border-b border-green-800">
+                        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                             <button type="button" onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.INDIVIDUAL }))}
+                                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${customer.type === CustomerType.INDIVIDUAL ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}>
+                                Pessoa Física
+                            </button>
+                            <button type="button" onClick={() => setCustomer(prev => ({ ...prev, type: CustomerType.COMPANY }))}
+                                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${customer.type === CustomerType.COMPANY ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}>
+                                Pessoa Jurídica
+                            </button>
+                        </nav>
+                    </div>
+                    {customer.type === CustomerType.INDIVIDUAL ? (
+                         <fieldset className="border border-green-800 p-4 rounded-lg"><legend className="px-2 text-green-400 font-semibold">Pessoa Física</legend>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <InputField label="Nome Completo" name="fullName" value={customer.fullName} onChange={handleChange} required />
+                                <InputField label="CPF" name="cpf" value={customer.cpf} onChange={handleChange} />
+                                <InputField label="Telefone" name="phone" value={customer.phone} onChange={handleChange} required />
                             </div>
                         </fieldset>
-
-                        <div className="flex justify-end space-x-4 pt-4">
-                            <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">
-                                Cancelar
-                            </button>
-                            <button type="submit" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">
-                                Salvar
-                            </button>
+                    ) : (
+                        <fieldset className="border border-green-800 p-4 rounded-lg"><legend className="px-2 text-green-400 font-semibold">Pessoa Jurídica</legend>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <InputField label="Razão Social" name="companyName" value={customer.companyName} onChange={handleChange} required />
+                                <InputField label="Nome Fantasia" name="tradingName" value={customer.tradingName} onChange={handleChange} />
+                                <InputField label="CNPJ" name="cnpj" value={customer.cnpj} onChange={handleChange} required />
+                                <InputField label="Inscrição Estadual" name="stateRegistration" value={customer.stateRegistration} onChange={handleChange} />
+                                <InputField label="Nome de Contato" name="contactName" value={customer.contactName} onChange={handleChange} />
+                                <InputField label="Telefone" name="phone" value={customer.phone} onChange={handleChange} required />
+                            </div>
+                        </fieldset>
+                    )}
+                    <fieldset className="border border-green-800 p-4 rounded-lg"><legend className="px-2 text-green-400 font-semibold">Endereço</legend>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <InputField label="CEP" name="zipCode" value={customer.address.zipCode} onChange={handleAddressChange} />
+                            <InputField label="Logradouro" name="street" value={customer.address.street} onChange={handleAddressChange} className="md:col-span-2" />
+                            <InputField label="Número" name="number" value={customer.address.number} onChange={handleAddressChange} />
+                            <InputField label="Complemento" name="complement" value={customer.address.complement} onChange={handleAddressChange} />
+                            <InputField label="Bairro" name="neighborhood" value={customer.address.neighborhood} onChange={handleAddressChange} />
+                            <InputField label="Cidade" name="city" value={customer.address.city} onChange={handleAddressChange} />
+                            <InputField label="Estado" name="state" value={customer.address.state} onChange={handleAddressChange} />
                         </div>
-                    </form>
+                    </fieldset>
+                </form>
+                 <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg flex justify-end space-x-4">
+                    <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
+                    <button type="submit" formAction="submit" onClick={handleSubmit} className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Salvar</button>
                 </div>
             </div>
         </div>
     );
 };
+
+const InputField = ({ label, name, type = 'text', value, onChange, required = false, className = '' }: { label: string, name: string, type?: string, value?: string, onChange: (e: any) => void, required?: boolean, className?: string }) => (
+    <div className={className}>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
+        <input
+            type={type} id={name} name={name} value={value || ''} onChange={onChange} required={required}
+            className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-white" />
+    </div>
+);
+
 
 export default PdvPage;

@@ -4,7 +4,8 @@ import { useAuth } from '../../app/context/AuthContext';
 import { useCompany } from '../../app/context/CompanyContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
-    BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon
+    BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
+    ArchiveIcon
 } from './icons';
 
 const navItems = [
@@ -13,6 +14,7 @@ const navItems = [
     { path: '/clientes', label: 'Clientes', icon: UsersIcon },
     { path: '/pdv', label: 'PDV', icon: ShoppingCartIcon },
     { path: '/produtos', label: 'Produtos', icon: PackageIcon },
+    { path: '/estoque', label: 'Estoque', icon: ArchiveIcon },
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },

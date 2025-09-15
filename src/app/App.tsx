@@ -11,6 +11,7 @@ import CustomersPage from '../ui/pages/CustomersPage';
 import EmployeesPage from '../ui/pages/EmployeesPage';
 import PdvPage from '../ui/pages/PdvPage';
 import ProductsPage from '../ui/pages/ProductsPage';
+import StockPage from '../ui/pages/StockPage';
 import FinancialPage from '../ui/pages/FinancialPage';
 import CompanyPage from '../ui/pages/CompanyPage';
 import ProfilePage from '../ui/pages/ProfilePage';
@@ -42,6 +43,7 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/clientes" element={<CustomersPage />} />
                                     <Route path="/pdv" element={<PdvPage />} />
                                     <Route path="/produtos" element={<ProductsPage />} />
+                                    <Route path="/estoque" element={<StockPage />} />
                                     <Route path="/financeiro" element={<FinancialPage />} />
                                     <Route path="/empresa" element={<CompanyPage />} />
                                     <Route path="/perfil" element={<ProfilePage />} />
