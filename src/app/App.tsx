@@ -1,0 +1,71 @@
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { CompanyProvider } from './context/CompanyContext';
+
+import MainLayout from '../ui/components/Layout';
+import DashboardPage from '../ui/pages/DashboardPage';
+import LoginPage from '../ui/pages/LoginPage';
+import CustomersPage from '../ui/pages/CustomersPage';
+import EmployeesPage from '../ui/pages/EmployeesPage';
+import PdvPage from '../ui/pages/PdvPage';
+import ProductsPage from '../ui/pages/ProductsPage';
+import FinancialPage from '../ui/pages/FinancialPage';
+import CompanyPage from '../ui/pages/CompanyPage';
+import ProfilePage from '../ui/pages/ProfilePage';
+import ReportsPage from '../ui/pages/ReportsPage';
+import SettingsPage from '../ui/pages/SettingsPage';
+
+
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const AppRoutes: React.FC = () => {
+    const { isAuthenticated } = useAuth();
+
+    return (
+        <HashRouter>
+            <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route
+                    path="/*"
+                    element={
+                        <ProtectedRoute>
+                            <MainLayout>
+                                <Routes>
+                                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                    <Route path="/dashboard" element={<DashboardPage />} />
+                                    <Route path="/funcionarios" element={<EmployeesPage />} />
+                                    <Route path="/clientes" element={<CustomersPage />} />
+                                    <Route path="/pdv" element={<PdvPage />} />
+                                    <Route path="/produtos" element={<ProductsPage />} />
+                                    <Route path="/financeiro" element={<FinancialPage />} />
+                                    <Route path="/empresa" element={<CompanyPage />} />
+                                    <Route path="/perfil" element={<ProfilePage />} />
+                                    <Route path="/relatorios" element={<ReportsPage />} />
+                                    <Route path="/configuracoes" element={<SettingsPage />} />
+                                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                                </Routes>
+                            </MainLayout>
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </HashRouter>
+    );
+}
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <CompanyProvider>
+        <AppRoutes />
+      </CompanyProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;

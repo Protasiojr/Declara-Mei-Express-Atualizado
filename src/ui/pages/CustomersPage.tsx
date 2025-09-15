@@ -1,58 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { PlusCircleIcon } from '../components/icons';
-import { Customer, CustomerType, Address } from '../types';
-
-const initialMockCustomers: Customer[] = [
-    { 
-        id: '1', 
-        type: CustomerType.INDIVIDUAL,
-        fullName: 'Cliente Feliz',
-        cpf: '111.222.333-44',
-        phone: '(11) 99999-8888',
-        address: {
-            street: 'Rua das Alegrias',
-            number: '123',
-            neighborhood: 'Centro',
-            city: 'São Paulo',
-            state: 'SP',
-            zipCode: '01001-000'
-        }
-    },
-    { 
-        id: '2', 
-        type: CustomerType.COMPANY,
-        companyName: 'Empresa Parceira LTDA',
-        tradingName: 'Empresa Parceira',
-        cnpj: '12.345.678/0001-99',
-        stateRegistration: 'Isento',
-        contactName: 'Sr. Contato',
-        phone: '(21) 88888-7777',
-        address: {
-            street: 'Avenida Brasil',
-            number: '1000',
-            neighborhood: 'Bonsucesso',
-            city: 'Rio de Janeiro',
-            state: 'RJ',
-            zipCode: '21040-360'
-        }
-    },
-    {
-        id: '3',
-        type: CustomerType.INDIVIDUAL,
-        fullName: 'Sr. Silva',
-        cpf: '444.555.666-77',
-        phone: '(31) 77777-6666',
-        address: {
-            street: 'Rua dos Inconfidentes',
-            number: '500',
-            neighborhood: 'Savassi',
-            city: 'Belo Horizonte',
-            state: 'MG',
-            zipCode: '30140-120'
-        }
-    }
-];
+import { Customer, CustomerType, Address } from '../../domain/types';
+import { initialMockCustomers } from '../../data/mocks';
 
 const initialCustomerState: Customer = {
     id: '',

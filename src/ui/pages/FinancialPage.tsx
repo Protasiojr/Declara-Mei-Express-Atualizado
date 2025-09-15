@@ -1,18 +1,6 @@
-
 import React, { useState } from 'react';
 import { PlusCircleIcon } from '../components/icons';
-
-const mockPayables = [
-    { id: 1, desc: 'Aluguel', category: 'Despesas Fixas', value: 'R$ 800,00', due: '10/07/2025', paid: false },
-    { id: 2, desc: 'Fornecedor A', category: 'Compras', value: 'R$ 450,00', due: '15/07/2025', paid: false },
-    { id: 3, desc: 'Internet', category: 'Despesas Fixas', value: 'R$ 99,00', due: '05/07/2025', paid: true },
-];
-
-const mockReceivables = [
-    { id: 1, desc: 'Venda #123 - Cliente Feliz', value: 'R$ 300,00', due: '20/07/2025', received: false },
-    { id: 2, desc: 'Serviço Y - Empresa Parceira', value: 'R$ 120,00', due: '01/08/2025', received: false },
-    { id: 3, desc: 'Venda #121 - Sr. Silva', value: 'R$ 80,00', due: '01/07/2025', received: true },
-];
+import { mockPayables, mockReceivables } from '../../data/mocks';
 
 const FinancialPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('payable');

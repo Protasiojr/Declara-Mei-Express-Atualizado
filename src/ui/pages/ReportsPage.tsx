@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const ReportCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (

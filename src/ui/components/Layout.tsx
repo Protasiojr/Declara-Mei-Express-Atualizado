@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth, useCompany } from '../App';
+import { useAuth } from '../../app/context/AuthContext';
+import { useCompany } from '../../app/context/CompanyContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon

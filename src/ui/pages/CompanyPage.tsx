@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useCompany } from '../App';
+import { useCompany } from '../../app/context/CompanyContext';
 
 const FormSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">

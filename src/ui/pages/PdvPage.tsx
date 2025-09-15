@@ -1,47 +1,31 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { PlusCircleIcon } from '../components/icons';
-import { Customer, CustomerType, Address } from '../types';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useCompany } from '../../app/context/CompanyContext';
+import { PlusCircleIcon, BarcodeIcon, Trash2Icon, PlusIcon, MinusIcon, ArrowUpCircleIcon, ArrowDownCircleIcon, PrinterIcon } from '../components/icons';
+import { Customer, CustomerType, Address } from '../../domain/types';
+import { searchablePdvItems, pdvMockCustomers } from '../../data/mocks';
 
-const quickProducts = [
-    { id: 1, name: "Produto A", price: 10.00 },
-    { id: 2, name: "Produto B", price: 25.50 },
-    { id: 3, name: "Serviço X", price: 50.00 },
-    { id: 4, name: "Produto C", price: 5.75 },
-    { id: 5, name: "Produto D", price: 18.20 },
-    { id: 6, name: "Produto E", price: 33.00 },
-    { id: 7, name: "Produto F", price: 12.00 },
-    { id: 8, name: "Serviço Y", price: 150.00 },
-];
+// FIX: Define explicit types for searchable items to enable discriminated union type checking.
+// This resolves type errors when accessing properties specific to products (sku, barcode).
+interface SearchableProduct {
+    id: string;
+    name: string;
+    barcode?: string;
+    sku: string;
+    category: string;
+    price: number;
+    stock: number;
+    type: 'product';
+}
 
-const mockCustomers: Customer[] = [
-    { 
-        id: '1', 
-        type: CustomerType.INDIVIDUAL,
-        fullName: 'Cliente Feliz',
-        cpf: '111.222.333-44',
-        phone: '(11) 99999-8888',
-        address: { street: 'Rua das Alegrias', number: '123', neighborhood: 'Centro', city: 'São Paulo', state: 'SP', zipCode: '01001-000' }
-    },
-    { 
-        id: '2', 
-        type: CustomerType.COMPANY,
-        companyName: 'Empresa Parceira LTDA',
-        tradingName: 'Empresa Parceira',
-        cnpj: '12.345.678/0001-99',
-        stateRegistration: 'Isento',
-        contactName: 'Sr. Contato',
-        phone: '(21) 88888-7777',
-        address: { street: 'Avenida Brasil', number: '1000', neighborhood: 'Bonsucesso', city: 'Rio de Janeiro', state: 'RJ', zipCode: '21040-360' }
-    },
-    {
-        id: '3',
-        type: CustomerType.INDIVIDUAL,
-        fullName: 'Sr. Silva',
-        cpf: '444.555.666-77',
-        phone: '(31) 77777-6666',
-        address: { street: 'Rua dos Inconfidentes', number: '500', neighborhood: 'Savassi', city: 'Belo Horizonte', state: 'MG', zipCode: '30140-120' }
-    }
-];
+interface SearchableService {
+    id: string;
+    name: string;
+    price: number;
+    type: 'service';
+}
+
+type SearchableItem = SearchableProduct | SearchableService;
+
 
 const initialCustomerState: Customer = {
     id: '',
@@ -65,9 +49,8 @@ const initialCustomerState: Customer = {
     }
 };
 
-
 interface CartItem {
-    id: number;
+    id: string;
     name: string;
     price: number;
     quantity: number;
@@ -90,7 +73,11 @@ interface CashierMovement {
     amount: number;
     timestamp: string;
 }
-type ActiveModal = 'openCashier' | 'payment' | 'history' | 'movements' | 'closeCashier' | 'newCustomer' | null;
+type CashMovementType = 'Sangria' | 'Suprimento';
+
+type ActiveModal = 'openCashier' | 'payment' | 'history' | 'movements' | 'closeCashier' | 'newCustomer' | 'cashMovement' | 'receipt' | null;
+
+const quickProducts = searchablePdvItems.filter(item => item.type === 'product').slice(0, 10) as SearchableProduct[];
 
 const PdvPage: React.FC = () => {
     const [isCashierOpen, setIsCashierOpen] = useState(false);
@@ -99,16 +86,41 @@ const PdvPage: React.FC = () => {
     const [initialBalance, setInitialBalance] = useState(0);
     const [cashierMovements, setCashierMovements] = useState<CashierMovement[]>([]);
     const [salesHistory, setSalesHistory] = useState<Sale[]>([]);
-    const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+    const [customers, setCustomers] = useState<Customer[]>(pdvMockCustomers);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    // FIX: Use the new SearchableItem type for searchResults state.
+    const [searchResults, setSearchResults] = useState<SearchableItem[]>([]);
+    const [lastSale, setLastSale] = useState<Sale | null>(null);
+    // FIX: Corrected initial state for cashMovementType. 'Saída' is not a valid CashMovementType.
+    // Changed to 'Sangria' which is a valid type.
+    const [cashMovementType, setCashMovementType] = useState<CashMovementType>('Sangria');
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
 
     useEffect(() => {
         if (!isCashierOpen) {
             setActiveModal('openCashier');
         } else {
             setActiveModal(null);
+            searchInputRef.current?.focus();
         }
     }, [isCashierOpen]);
+
+    useEffect(() => {
+        if (searchQuery.length > 1) {
+            const lowercasedQuery = searchQuery.toLowerCase();
+            setSearchResults(
+                // FIX: Cast searchablePdvItems to SearchableItem[] to allow filtering on product-specific fields.
+                (searchablePdvItems as SearchableItem[]).filter(item =>
+                    item.name.toLowerCase().includes(lowercasedQuery) ||
+                    (item.type === 'product' && (item.sku?.toLowerCase().includes(lowercasedQuery) || item.barcode?.includes(lowercasedQuery)))
+                )
+            );
+        } else {
+            setSearchResults([]);
+        }
+    }, [searchQuery]);
 
     const handleOpenCashier = (balance: number) => {
         const timestamp = new Date().toLocaleString('pt-BR');
@@ -117,7 +129,7 @@ const PdvPage: React.FC = () => {
         setIsCashierOpen(true);
     };
 
-    const addToCart = (product: { id: number, name: string, price: number }) => {
+    const addToCart = (product: { id: string, name: string, price: number }) => {
         if (!isCashierOpen) return;
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.id === product.id);
@@ -128,6 +140,31 @@ const PdvPage: React.FC = () => {
             }
             return [...prevCart, { ...product, quantity: 1 }];
         });
+        setSearchQuery('');
+        setSearchResults([]);
+        searchInputRef.current?.focus();
+    };
+    
+    const updateCartQuantity = (productId: string, newQuantity: number) => {
+        setCart(prevCart => {
+            if (newQuantity <= 0) {
+                return prevCart.filter(item => item.id !== productId);
+            }
+            return prevCart.map(item => item.id === productId ? { ...item, quantity: newQuantity } : item);
+        });
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery) {
+            // FIX: Cast searchablePdvItems to SearchableItem[] to allow finding on product-specific fields.
+            const exactMatch = (searchablePdvItems as SearchableItem[]).find(item => item.type === 'product' && (item.barcode === searchQuery || item.sku === searchQuery));
+            if (exactMatch) {
+                addToCart(exactMatch);
+            } else if (searchResults.length > 0) {
+                addToCart(searchResults[0]);
+            }
+        }
     };
 
     const handleCancelSale = () => {
@@ -158,15 +195,28 @@ const PdvPage: React.FC = () => {
 
         setSalesHistory(prev => [newSale, ...prev].slice(0, 20));
         setCashierMovements(prev => [...prev, newMovement]);
+        setLastSale(newSale);
         setCart([]);
         setSelectedCustomer(null);
-        setActiveModal(null);
+        setActiveModal('receipt');
     };
 
     const handleSaveNewCustomer = (customer: Customer) => {
         setCustomers(prev => [...prev, customer]);
         setSelectedCustomer(customer);
         setActiveModal('payment');
+    };
+    
+    const handleAddCashMovement = (type: CashMovementType, amount: number, description: string) => {
+        const newMovement: CashierMovement = {
+            id: `M${Date.now()}`,
+            type: type === 'Suprimento' ? 'Entrada' : 'Saída',
+            description: `${type}: ${description}`,
+            amount,
+            timestamp: new Date().toLocaleString('pt-BR')
+        };
+        setCashierMovements(prev => [...prev, newMovement]);
+        setActiveModal(null);
     };
 
     const handleCloseCashier = () => {
@@ -183,83 +233,116 @@ const PdvPage: React.FC = () => {
 
     const renderModal = () => {
         switch (activeModal) {
-            case 'openCashier':
-                return <OpenCashierModal onOpen={handleOpenCashier} />;
-            case 'payment':
-                return <PaymentModal 
-                            total={total} 
-                            onCancel={() => { setActiveModal(null); setSelectedCustomer(null); }} 
-                            onFinalize={handleFinalizeSale} 
-                            customers={customers} 
-                            selectedCustomer={selectedCustomer}
-                            onSelectCustomer={setSelectedCustomer}
-                            onAddNewCustomer={() => setActiveModal('newCustomer')}
-                        />;
-            case 'history':
-                return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
-            case 'movements':
-                return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
-            case 'closeCashier':
-                return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} />;
-            case 'newCustomer':
-                return <CustomerModal 
-                            isOpen={true} 
-                            onClose={() => setActiveModal('payment')} 
-                            onSave={handleSaveNewCustomer} 
-                            customerToEdit={null}
-                        />;
-            default:
-                return null;
+            case 'openCashier': return <OpenCashierModal onOpen={handleOpenCashier} />;
+            case 'payment': return <PaymentModal total={total} onCancel={() => { setActiveModal(null); setSelectedCustomer(null); }} onFinalize={handleFinalizeSale} customers={customers} selectedCustomer={selectedCustomer} onSelectCustomer={setSelectedCustomer} onAddNewCustomer={() => setActiveModal('newCustomer')} />;
+            case 'history': return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
+            case 'movements': return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
+            case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} />;
+            case 'newCustomer': return <CustomerModal isOpen={true} onClose={() => setActiveModal('payment')} onSave={handleSaveNewCustomer} customerToEdit={null} />;
+            case 'cashMovement': return <CashMovementModal type={cashMovementType} onClose={() => setActiveModal(null)} onConfirm={handleAddCashMovement} />;
+            case 'receipt': return lastSale && <ReceiptModal sale={lastSale} onClose={() => { setLastSale(null); setActiveModal(null); searchInputRef.current?.focus(); }} />;
+            default: return null;
         }
     };
     
     return (
         <div className="h-full flex flex-col lg:flex-row gap-6">
             {renderModal()}
-            <div className="lg:w-2/3">
+            <div className="lg:w-2/3 flex flex-col gap-4">
                 <div className="bg-green-900 p-4 rounded-lg border border-green-800">
-                    <h2 className="text-xl font-bold text-white mb-4">Produtos para Venda Rápida</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {quickProducts.map(p => (
-                            <button key={p.id} onClick={() => addToCart(p)} className="bg-green-800 p-4 rounded-lg text-center hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={!isCashierOpen}>
-                                <p className="font-semibold text-white">{p.name}</p>
-                                <p className="text-sm text-gray-300">R$ {p.price.toFixed(2)}</p>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <div className="lg:w-1/3 flex flex-col">
-                <div className="bg-green-900 p-6 rounded-lg border border-green-800 flex-grow flex flex-col">
-                    <h2 className="text-2xl font-bold text-white mb-4">Venda Atual</h2>
-                    <div className="flex-grow overflow-y-auto pr-2 min-h-[200px]">
-                        {cart.length === 0 ? (<p className="text-gray-400">Nenhum item na venda.</p>) : (
-                            <ul className="space-y-3">
-                                {cart.map(item => (
-                                    <li key={item.id} className="flex justify-between items-center text-gray-300">
-                                        <div>
-                                            <p className="font-medium text-white">{item.name}</p>
-                                            <p className="text-sm">{item.quantity} x R$ {item.price.toFixed(2)}</p>
+                    <form onSubmit={handleSearchSubmit} className="relative mb-4">
+                        <label htmlFor="product-search" className="sr-only">Buscar Produto</label>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <BarcodeIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            id="product-search"
+                            placeholder="Ler código de barras ou buscar produto..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            disabled={!isCashierOpen}
+                            className="block w-full bg-green-950 border border-green-700 rounded-lg py-2 pl-10 pr-3 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                        />
+                        {searchResults.length > 0 && (
+                             <ul className="absolute z-10 w-full mt-1 bg-green-950 border border-green-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                {searchResults.map(item => (
+                                    <li key={item.id} onMouseDown={() => addToCart(item)} className="px-4 py-3 cursor-pointer hover:bg-green-800 text-white">
+                                        <p className="font-semibold">{item.name}</p>
+                                        <div className="flex justify-between text-sm text-gray-400">
+                                            <span>R$ {item.price.toFixed(2)}</span>
+                                            {item.type === 'product' && <span>SKU: {item.sku}</span>}
                                         </div>
-                                        <p className="font-semibold text-white">R$ {(item.quantity * item.price).toFixed(2)}</p>
                                     </li>
                                 ))}
                             </ul>
                         )}
+                    </form>
+                </div>
+
+                <div className="bg-green-900 p-4 rounded-lg border border-green-800 flex-grow">
+                    <h3 className="text-lg font-semibold text-white mb-4">Acesso Rápido</h3>
+                    {isCashierOpen ? (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                            {quickProducts.map(product => (
+                                <button
+                                    key={product.id}
+                                    onClick={() => addToCart(product)}
+                                    className="bg-green-800 p-3 rounded-lg text-center hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!isCashierOpen}
+                                >
+                                    <p className="text-white font-semibold text-sm truncate">{product.name}</p>
+                                    <p className="text-green-400 text-xs mt-1">R$ {product.price.toFixed(2)}</p>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-gray-500 py-10">
+                            <p>Abra o caixa para ver os produtos.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="lg:w-1/3 flex flex-col">
+                <div className="bg-green-900 p-4 rounded-lg border border-green-800 flex-grow flex flex-col">
+                    <h2 className="text-2xl font-bold text-white mb-4">Venda Atual</h2>
+                    <div className="flex-grow overflow-y-auto pr-2 min-h-[200px] space-y-2">
+                        {cart.length === 0 ? (<p className="text-gray-400 text-center py-10">Carrinho vazio.</p>) : (
+                            cart.map(item => (
+                                <div key={item.id} className="flex items-center justify-between text-gray-300 bg-green-800/50 p-2 rounded-md">
+                                    <div className="flex-grow">
+                                        <p className="font-medium text-white">{item.name}</p>
+                                        <p className="text-sm text-green-400 font-mono">R$ {(item.quantity * item.price).toFixed(2)}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={() => updateCartQuantity(item.id, item.quantity - 1)} className="p-1 rounded-full hover:bg-green-700"><MinusIcon className="w-4 h-4" /></button>
+                                        <span className="font-mono text-white w-6 text-center">{item.quantity}</span>
+                                        <button onClick={() => updateCartQuantity(item.id, item.quantity + 1)} className="p-1 rounded-full hover:bg-green-700"><PlusIcon className="w-4 h-4" /></button>
+                                        <button onClick={() => updateCartQuantity(item.id, 0)} className="p-1 rounded-full hover:bg-red-500/50 text-red-400"><Trash2Icon className="w-4 h-4" /></button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                     <div className="border-t border-green-800 mt-4 pt-4">
-                        <div className="flex justify-between text-xl font-bold text-white mb-6">
+                        <div className="flex justify-between text-xl font-bold text-white mb-4">
                             <span>Total</span>
                             <span>R$ {total.toFixed(2)}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                             {/* FIX: Corrected argument for setCashMovementType. 'Saída' is not a valid CashMovementType. Changed to 'Sangria'. */}
+                             <button onClick={() => { setCashMovementType('Sangria'); setActiveModal('cashMovement'); }} className="flex items-center justify-center gap-2 bg-yellow-600/50 text-yellow-300 py-2 rounded-lg font-semibold hover:bg-yellow-600/80 disabled:opacity-50" disabled={!isCashierOpen}><ArrowDownCircleIcon className="w-5"/> Sangria</button>
+                             <button onClick={() => { setCashMovementType('Suprimento'); setActiveModal('cashMovement'); }} className="flex items-center justify-center gap-2 bg-blue-600/50 text-blue-300 py-2 rounded-lg font-semibold hover:bg-blue-600/80 disabled:opacity-50" disabled={!isCashierOpen}><ArrowUpCircleIcon className="w-5"/> Suprimento</button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
                             <button onClick={() => setActiveModal('history')} className="bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50" disabled={!isCashierOpen}>Histórico</button>
                             <button onClick={() => setActiveModal('movements')} className="bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50" disabled={!isCashierOpen}>Mov. Caixa</button>
-                            <button onClick={handleCancelSale} className="bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50" disabled={!isCashierOpen || cart.length === 0}>Cancelar Venda</button>
+                            <button onClick={handleCancelSale} className="bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50" disabled={!isCashierOpen || cart.length === 0}>Cancelar</button>
                             <button onClick={() => setActiveModal('payment')} className="bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-500 disabled:opacity-50" disabled={!isCashierOpen || cart.length === 0}>Pagamento</button>
                         </div>
-                         <button onClick={() => setActiveModal('closeCashier')} className="w-full mt-4 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 disabled:opacity-50" disabled={!isCashierOpen}>Fechar Caixa</button>
+                         <button onClick={() => setActiveModal('closeCashier')} className="w-full mt-2 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 disabled:opacity-50" disabled={!isCashierOpen}>Fechar Caixa</button>
                     </div>
                 </div>
             </div>
@@ -484,6 +567,133 @@ const CloseCashierModal: React.FC<{ movements: CashierMovement[]; initialBalance
                 <div className="flex justify-between text-lg font-bold text-white">
                     <span>Saldo Final Esperado</span>
                     <span>R$ {summary.expectedBalance.toFixed(2)}</span>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
+const CashMovementModal: React.FC<{ type: CashMovementType; onClose: () => void; onConfirm: (type: CashMovementType, amount: number, description: string) => void }> = ({ type, onClose, onConfirm }) => {
+    const [amount, setAmount] = useState('');
+    const [description, setDescription] = useState('');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onConfirm(type, parseFloat(amount), description);
+    };
+    return (
+        <Modal
+            // FIX: Corrected comparison for modal title. 'Saída' is not a valid CashMovementType. Changed to 'Sangria'.
+            title={type === 'Sangria' ? 'Registrar Sangria (Saída)' : 'Registrar Suprimento (Entrada)'}
+            footer={
+                <div className="flex justify-between items-center">
+                    <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Cancelar</button>
+                    <button type="submit" form="cash-movement-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-semibold text-white">Confirmar</button>
+                </div>
+            }
+        >
+            <form id="cash-movement-form" onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label htmlFor="mov-amount" className="block text-sm font-medium text-gray-300">Valor</label>
+                    <input type="number" id="mov-amount" value={amount} onChange={e => setAmount(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
+                        placeholder="R$ 0,00" autoFocus required />
+                </div>
+                <div>
+                    <label htmlFor="mov-description" className="block text-sm font-medium text-gray-300">Descrição/Motivo</label>
+                    <input type="text" id="mov-description" value={description} onChange={e => setDescription(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
+                        placeholder="Ex: Depósito, Troco" required />
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
+const ReceiptModal: React.FC<{ sale: Sale; onClose: () => void; }> = ({ sale, onClose }) => {
+    const { logo } = useCompany();
+    const receiptRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = () => {
+        const content = receiptRef.current?.innerHTML;
+        if (!content) return;
+        const printWindow = window.open('', '_blank', 'height=800,width=600');
+        if (printWindow) {
+            printWindow.document.write('<html><head><title>Comprovante de Venda</title>');
+            printWindow.document.write(`
+                <style>
+                    body { font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; background-color: #fff; color: #000; width: 300px; }
+                    .receipt { border: 1px solid #ccc; padding: 10px; }
+                    h1, h2, p { margin: 0; text-align: center; }
+                    .logo { max-width: 150px; max-height: 80px; margin: 0 auto 10px; display: block; }
+                    hr { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+                    .items-table { width: 100%; border-collapse: collapse; }
+                    .items-table th, .items-table td { text-align: left; padding: 2px 0; }
+                    .items-table .qty { text-align: center; }
+                    .items-table .price { text-align: right; }
+                    .totals { margin-top: 10px; }
+                    .totals div { display: flex; justify-content: space-between; font-weight: bold; }
+                </style>
+            `);
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(content);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+    };
+    
+    return (
+        <Modal
+            title="Venda Finalizada"
+            size="max-w-sm"
+            footer={
+                <div className="flex justify-between items-center w-full">
+                    <button onClick={onClose} className="w-1/2 px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Fechar</button>
+                    <button onClick={handlePrint} className="w-1/2 flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-semibold text-white"><PrinterIcon className="w-5" /> Imprimir</button>
+                </div>
+            }
+        >
+            <div ref={receiptRef}>
+                <div className="text-center text-black bg-white p-4 rounded-md font-mono">
+                    {logo && <img src={logo} alt="Logo" className="logo" />}
+                    <h2 className="text-lg font-bold">Minha Empresa MEI</h2>
+                    <p className="text-xs">CNPJ: 12.345.678/0001-90</p>
+                    <p className="text-xs">Rua das Flores, 123</p>
+                    <hr />
+                    <p className="text-xs">COMPROVANTE DE VENDA</p>
+                    <p className="text-xs">Venda: {sale.id} | Data: {sale.timestamp}</p>
+                    {sale.customer && (
+                        <>
+                            <hr />
+                            <p className="text-xs text-left font-bold">CLIENTE:</p>
+                            <p className="text-xs text-left">{sale.customer.fullName || sale.customer.companyName}</p>
+                            <p className="text-xs text-left">{sale.customer.cpf || sale.customer.cnpj}</p>
+                        </>
+                    )}
+                    <hr />
+                    <table className="items-table text-xs w-full">
+                        <thead><tr><th>Qtd</th><th>Item</th><th className="price">Total</th></tr></thead>
+                        <tbody>
+                            {sale.items.map(item => (
+                                <tr key={item.id}>
+                                    <td className="qty">{item.quantity}x</td>
+                                    <td>{item.name}</td>
+                                    <td className="price">{(item.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <hr />
+                    <div className="totals text-sm">
+                        <div><span>TOTAL</span><span>R$ {sale.total.toFixed(2)}</span></div>
+                        <div className="text-xs"><span>Forma Pgto.</span><span>{sale.paymentMethod}</span></div>
+                        {sale.paidAmount && <div><span className="text-xs">Valor Pago</span><span>R$ {sale.paidAmount.toFixed(2)}</span></div>}
+                        {sale.change && sale.change > 0 && <div><span className="text-xs">Troco</span><span>R$ {sale.change.toFixed(2)}</span></div>}
+                    </div>
                 </div>
             </div>
         </Modal>

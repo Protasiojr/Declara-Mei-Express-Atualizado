@@ -1,44 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { PlusCircleIcon } from '../components/icons';
-import { Employee, Address } from '../types';
-
-const initialMockEmployees: Employee[] = [
-    { 
-        id: '1', 
-        name: 'João da Silva', 
-        phone: '(11) 91234-5678', 
-        pis: '120.12345.67-8',
-        ctps: '1234567-89',
-        address: {
-            street: 'Rua das Flores',
-            number: '123',
-            complement: 'Apto 101',
-            neighborhood: 'Centro',
-            city: 'São Paulo',
-            state: 'SP',
-            zipCode: '01001-000'
-        },
-        vacationStart: '2025-01-01',
-        vacationEnd: '2025-01-30'
-    },
-    { 
-        id: '2', 
-        name: 'Maria Oliveira', 
-        phone: '(21) 98765-4321',
-        pis: '120.87654.32-1',
-        ctps: '9876543-21',
-        address: {
-            street: 'Avenida Copacabana',
-            number: '500',
-            complement: '',
-            neighborhood: 'Copacabana',
-            city: 'Rio de Janeiro',
-            state: 'RJ',
-            zipCode: '22020-001'
-        }
-    },
-];
+import { Employee, Address } from '../../domain/types';
+import { initialMockEmployees } from '../../data/mocks';
 
 const initialEmployeeState: Employee = {
     id: '',

@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useAuth } from '../App';
+import { useAuth } from '../../app/context/AuthContext';
 
 const SettingsCard: React.FC<{ title: string; description: string; children: React.ReactNode }> = ({ title, description, children }) => (
     <div className="bg-green-900 rounded-lg shadow-md border border-green-800">

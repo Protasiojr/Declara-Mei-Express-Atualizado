@@ -1,16 +1,7 @@
-
 import React, { useState } from 'react';
 import { PlusCircleIcon } from '../components/icons';
+import { mockProducts, mockServices } from '../../data/mocks';
 
-const mockProducts = [
-    { id: 1, name: 'Produto A', category: 'Eletrônicos', price: 'R$ 10.00', stock: 100 },
-    { id: 2, name: 'Produto B', category: 'Material Escritório', price: 'R$ 25.50', stock: 50 },
-    { id: 3, name: 'Produto C', category: 'Alimentos', price: 'R$ 5.75', stock: 200 },
-];
-const mockServices = [
-    { id: 1, name: 'Serviço X', price: 'R$ 50.00' },
-    { id: 2, name: 'Serviço Y', price: 'R$ 120.00' },
-];
 
 const ProductsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('products');

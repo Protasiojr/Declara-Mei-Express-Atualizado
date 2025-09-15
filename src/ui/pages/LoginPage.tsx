@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useAuth } from '../App';
+import { useAuth } from '../../app/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
