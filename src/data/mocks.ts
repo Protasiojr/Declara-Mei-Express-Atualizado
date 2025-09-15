@@ -1,5 +1,5 @@
 
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -111,6 +111,45 @@ export const mockReceivables: Receivable[] = [
     { id: 'rec1', description: 'Venda para Cliente Feliz', value: 300.00, dueDate: '2024-08-15', received: false },
     { id: 'rec2', description: 'Serviço para Empresa Parceira', value: 120.00, dueDate: '2024-08-20', received: false },
     { id: 'rec3', description: 'Venda para Sr. Silva', value: 250.00, dueDate: '2024-07-25', received: true },
+];
+
+export const initialMockSuppliers: Supplier[] = [
+    {
+        id: 'sup1',
+        companyName: 'Fornecedor de Eletrônicos Rápido LTDA',
+        tradingName: 'Eletrônicos Rápido',
+        cnpj: '98.765.432/0001-11',
+        stateRegistration: '111.222.333.444',
+        contactName: 'Sra. Ana',
+        phone: '(11) 5555-4444',
+        address: {
+            street: 'Rua das Peças',
+            number: '1010',
+            neighborhood: 'Santa Ifigênia',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '01207-001'
+        },
+        invoices: []
+    },
+    {
+        id: 'sup2',
+        companyName: 'Distribuidora de Alimentos Sabor do Campo SA',
+        tradingName: 'Sabor do Campo',
+        cnpj: '87.654.321/0001-22',
+        stateRegistration: 'Isento',
+        contactName: 'Sr. Carlos',
+        phone: '(21) 4444-3333',
+        address: {
+            street: 'Avenida das Américas',
+            number: '500',
+            neighborhood: 'Barra da Tijuca',
+            city: 'Rio de Janeiro',
+            state: 'RJ',
+            zipCode: '22640-100'
+        },
+        invoices: ['NF-12345.pdf']
+    }
 ];
 
 interface SearchableProduct {

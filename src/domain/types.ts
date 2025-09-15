@@ -84,3 +84,15 @@ export interface Receivable {
   dueDate: string;
   received: boolean;
 }
+
+export interface Supplier {
+  id: string;
+  companyName: string;
+  tradingName?: string;
+  cnpj: string;
+  stateRegistration?: string;
+  contactName?: string;
+  phone: string;
+  address: Address;
+  invoices?: string[];
+}

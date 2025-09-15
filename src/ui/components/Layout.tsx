@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
@@ -5,20 +6,21 @@ import { useCompany } from '../../app/context/CompanyContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
-    ArchiveIcon
+    ArchiveIcon, TruckIcon
 } from './icons';
 
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: HomeIcon },
-    { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
-    { path: '/clientes', label: 'Clientes', icon: UsersIcon },
     { path: '/pdv', label: 'PDV', icon: ShoppingCartIcon },
+    { path: '/clientes', label: 'Clientes', icon: UsersIcon },
+    { path: '/fornecedores', label: 'Fornecedores', icon: TruckIcon },
     { path: '/produtos', label: 'Produtos', icon: PackageIcon },
     { path: '/estoque', label: 'Estoque', icon: ArchiveIcon },
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
+    { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
+    { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },
-    { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
 ];
 

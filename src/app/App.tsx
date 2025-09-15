@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ import CompanyPage from '../ui/pages/CompanyPage';
 import ProfilePage from '../ui/pages/ProfilePage';
 import ReportsPage from '../ui/pages/ReportsPage';
 import SettingsPage from '../ui/pages/SettingsPage';
+import SuppliersPage from '../ui/pages/SuppliersPage';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -39,15 +41,16 @@ const AppRoutes: React.FC = () => {
                                 <Routes>
                                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                                     <Route path="/dashboard" element={<DashboardPage />} />
-                                    <Route path="/funcionarios" element={<EmployeesPage />} />
-                                    <Route path="/clientes" element={<CustomersPage />} />
                                     <Route path="/pdv" element={<PdvPage />} />
+                                    <Route path="/clientes" element={<CustomersPage />} />
+                                    <Route path="/fornecedores" element={<SuppliersPage />} />
                                     <Route path="/produtos" element={<ProductsPage />} />
                                     <Route path="/estoque" element={<StockPage />} />
                                     <Route path="/financeiro" element={<FinancialPage />} />
+                                    <Route path="/funcionarios" element={<EmployeesPage />} />
+                                    <Route path="/relatorios" element={<ReportsPage />} />
                                     <Route path="/empresa" element={<CompanyPage />} />
                                     <Route path="/perfil" element={<ProfilePage />} />
-                                    <Route path="/relatorios" element={<ReportsPage />} />
                                     <Route path="/configuracoes" element={<SettingsPage />} />
                                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                 </Routes>
