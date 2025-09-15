@@ -81,6 +81,7 @@ const quickProducts = searchablePdvItems.filter(item => item.type === 'product')
 
 const PdvPage: React.FC = () => {
     const [isCashierOpen, setIsCashierOpen] = useState(false);
+    const [cashierOpenTime, setCashierOpenTime] = useState<string | null>(null);
     const [activeModal, setActiveModal] = useState<ActiveModal>(null);
     const [cart, setCart] = useState<CartItem[]>([]);
     const [initialBalance, setInitialBalance] = useState(0);
@@ -126,6 +127,7 @@ const PdvPage: React.FC = () => {
         const timestamp = new Date().toLocaleString('pt-BR');
         setInitialBalance(balance);
         setCashierMovements([{ id: `mov-0`, type: 'Entrada', description: 'Saldo Inicial', amount: balance, timestamp }]);
+        setCashierOpenTime(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
         setIsCashierOpen(true);
     };
 
@@ -226,6 +228,7 @@ const PdvPage: React.FC = () => {
         setInitialBalance(0);
         setCashierMovements([]);
         setSalesHistory([]);
+        setCashierOpenTime(null);
         setActiveModal(null);
     }
 
@@ -331,6 +334,33 @@ const PdvPage: React.FC = () => {
                             <span>Total</span>
                             <span>R$ {total.toFixed(2)}</span>
                         </div>
+
+                        <div className="border border-green-800 rounded-lg p-3 mb-4 space-y-2 text-sm">
+                            <h4 className="font-bold text-white text-base text-center mb-2">Controle de Caixa</h4>
+                            <div className="flex justify-between">
+                                <span className="text-gray-400">Status:</span>
+                                <span className={`font-semibold ${isCashierOpen ? 'text-green-400' : 'text-red-400'}`}>
+                                    {isCashierOpen ? 'Aberto' : 'Fechado'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-400">Operador:</span>
+                                <span className="text-white font-semibold">Admin</span>
+                            </div>
+                            {isCashierOpen && (
+                                <>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Abertura do Caixa:</span>
+                                        <span className="text-white font-semibold">{cashierOpenTime}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Saldo inicial:</span>
+                                        <span className="text-white font-semibold">R$ {initialBalance.toFixed(2)}</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         <div className="grid grid-cols-2 gap-2 mb-2">
                              {/* FIX: Corrected argument for setCashMovementType. 'Saída' is not a valid CashMovementType. Changed to 'Sangria'. */}
                              <button onClick={() => { setCashMovementType('Sangria'); setActiveModal('cashMovement'); }} className="flex items-center justify-center gap-2 bg-yellow-600/50 text-yellow-300 py-2 rounded-lg font-semibold hover:bg-yellow-600/80 disabled:opacity-50" disabled={!isCashierOpen}><ArrowDownCircleIcon className="w-5"/> Sangria</button>
