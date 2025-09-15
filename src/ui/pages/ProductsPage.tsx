@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { PlusCircleIcon } from '../components/icons';
 // FIX: Imports will now work after adding exports to mocks file.
@@ -10,9 +11,9 @@ const ProductsPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h1 className="text-3xl font-bold text-white">Produtos e Serviços</h1>
-                <button className="flex items-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700">
+                <button className="flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 w-full sm:w-auto">
                     <PlusCircleIcon className="w-5 h-5 mr-2" />
                     {activeTab === 'products' ? 'Adicionar Produto' : 'Adicionar Serviço'}
                 </button>
@@ -48,57 +49,61 @@ const ProductsPage: React.FC = () => {
 };
 
 const ProductsTable: React.FC = () => (
-    <table className="w-full text-sm text-left text-gray-300">
-        <thead className="text-xs text-gray-400 uppercase bg-green-800">
-            <tr>
-                <th scope="col" className="px-6 py-3">Nome do Produto</th>
-                <th scope="col" className="px-6 py-3">Categoria</th>
-                <th scope="col" className="px-6 py-3">Preço Venda</th>
-                <th scope="col" className="px-6 py-3">Estoque Atual</th>
-                <th scope="col" className="px-6 py-3">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {mockProducts.map(p => (
-                <tr key={p.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
-                    <td className="px-6 py-4 font-medium text-white">{p.name}</td>
-                    <td className="px-6 py-4">{p.category}</td>
-                    {/* FIX: Changed p.price to p.sellPrice and added formatting. */}
-                    <td className="px-6 py-4">R$ {p.sellPrice.toFixed(2)}</td>
-                    <td className="px-6 py-4">{p.stock}</td>
-                    <td className="px-6 py-4 space-x-2">
-                        <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
-                        <a href="#" className="font-medium text-red-400 hover:underline">Excluir</a>
-                    </td>
+    <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left text-gray-300">
+            <thead className="text-xs text-gray-400 uppercase bg-green-800">
+                <tr>
+                    <th scope="col" className="px-6 py-3">Nome do Produto</th>
+                    <th scope="col" className="px-6 py-3">Categoria</th>
+                    <th scope="col" className="px-6 py-3">Preço Venda</th>
+                    <th scope="col" className="px-6 py-3">Estoque Atual</th>
+                    <th scope="col" className="px-6 py-3">Ações</th>
                 </tr>
-            ))}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {mockProducts.map(p => (
+                    <tr key={p.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
+                        <td className="px-6 py-4 font-medium text-white">{p.name}</td>
+                        <td className="px-6 py-4">{p.category}</td>
+                        {/* FIX: Changed p.price to p.sellPrice and added formatting. */}
+                        <td className="px-6 py-4">R$ {p.sellPrice.toFixed(2)}</td>
+                        <td className="px-6 py-4">{p.stock}</td>
+                        <td className="px-6 py-4 space-x-2">
+                            <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
+                            <a href="#" className="font-medium text-red-400 hover:underline">Excluir</a>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
 );
 
 const ServicesTable: React.FC = () => (
-     <table className="w-full text-sm text-left text-gray-300">
-        <thead className="text-xs text-gray-400 uppercase bg-green-800">
-            <tr>
-                <th scope="col" className="px-6 py-3">Nome do Serviço</th>
-                <th scope="col" className="px-6 py-3">Preço</th>
-                <th scope="col" className="px-6 py-3">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {mockServices.map(s => (
-                <tr key={s.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
-                    <td className="px-6 py-4 font-medium text-white">{s.name}</td>
-                    {/* FIX: Added currency formatting. */}
-                    <td className="px-6 py-4">R$ {s.price.toFixed(2)}</td>
-                    <td className="px-6 py-4 space-x-2">
-                        <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
-                        <a href="#" className="font-medium text-red-400 hover:underline">Excluir</a>
-                    </td>
+    <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left text-gray-300">
+            <thead className="text-xs text-gray-400 uppercase bg-green-800">
+                <tr>
+                    <th scope="col" className="px-6 py-3">Nome do Serviço</th>
+                    <th scope="col" className="px-6 py-3">Preço</th>
+                    <th scope="col" className="px-6 py-3">Ações</th>
                 </tr>
-            ))}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {mockServices.map(s => (
+                    <tr key={s.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700">
+                        <td className="px-6 py-4 font-medium text-white">{s.name}</td>
+                        {/* FIX: Added currency formatting. */}
+                        <td className="px-6 py-4">R$ {s.price.toFixed(2)}</td>
+                        <td className="px-6 py-4 space-x-2">
+                            <a href="#" className="font-medium text-green-400 hover:underline">Editar</a>
+                            <a href="#" className="font-medium text-red-400 hover:underline">Excluir</a>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
 );
 
 export default ProductsPage;

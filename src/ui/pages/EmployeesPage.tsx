@@ -168,11 +168,11 @@ const EmployeesPage: React.FC = () => {
                 onSave={handleSaveEmployee}
                 employeeToEdit={employeeToEdit}
             />
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h1 className="text-3xl font-bold text-white">Funcionários</h1>
                 <button 
                     onClick={() => handleOpenModal()}
-                    className="flex items-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700"
+                    className="flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 w-full sm:w-auto"
                 >
                     <PlusCircleIcon className="w-5 h-5 mr-2" />
                     Adicionar Funcionário
