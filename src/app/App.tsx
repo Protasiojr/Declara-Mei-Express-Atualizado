@@ -22,6 +22,7 @@ import ProfilePage from '../ui/pages/ProfilePage';
 import ReportsPage from '../ui/pages/ReportsPage';
 import SettingsPage from '../ui/pages/SettingsPage';
 import SuppliersPage from '../ui/pages/SuppliersPage';
+import DasPage from '../ui/pages/DasPage';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,6 +53,7 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/financeiro" element={<FinancialPage />} />
                                     <Route path="/funcionarios" element={<EmployeesPage />} />
                                     <Route path="/relatorios" element={<ReportsPage />} />
+                                    <Route path="/das" element={<DasPage />} />
                                     <Route path="/empresa" element={<CompanyPage />} />
                                     <Route path="/perfil" element={<ProfilePage />} />
                                     <Route path="/configuracoes" element={<SettingsPage />} />

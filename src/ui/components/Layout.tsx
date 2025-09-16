@@ -21,6 +21,7 @@ const navItems = [
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
     { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
     { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
+    { path: '/das', label: 'DAS', icon: DollarSignIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
