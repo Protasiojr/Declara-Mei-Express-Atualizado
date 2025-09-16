@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon } from '../components/icons';
+import { useSettings } from '../../app/context/SettingsContext';
 
 const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; status?: string; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
@@ -107,10 +108,50 @@ const topClients = [
     { name: 'Sr. Silva', value: 'R$ 1,250.00' }, { name: 'Dona Maria', value: 'R$ 980.00' },
 ];
 
+const MeiLimitProgress: React.FC<{ currentRevenue: number; limit: number }> = ({ currentRevenue, limit }) => {
+    const percentage = limit > 0 ? (currentRevenue / limit) * 100 : 0;
+
+    const getProgressBarColor = () => {
+        if (percentage > 90) return 'bg-red-500';
+        if (percentage > 70) return 'bg-yellow-500';
+        return 'bg-green-500';
+    };
+
+    const formatCurrency = (value: number) => {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    };
+
+    return (
+        <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+            <h3 className="text-lg font-semibold text-white mb-2">Progresso do Limite Anual MEI</h3>
+            <div className="flex justify-between items-center text-sm text-gray-300 mb-2">
+                <span>{formatCurrency(currentRevenue)}</span>
+                <span className="font-bold">{percentage.toFixed(2)}%</span>
+                <span>{formatCurrency(limit)}</span>
+            </div>
+            <div className="w-full bg-green-950 rounded-full h-4 border border-green-800 overflow-hidden">
+                <div
+                    className={`h-4 rounded-full transition-all duration-500 ${getProgressBarColor()}`}
+                    style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
+                    role="progressbar"
+                    aria-valuenow={percentage}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                ></div>
+            </div>
+        </div>
+    );
+};
+
 const DashboardPage: React.FC = () => {
+    const { meiLimit } = useSettings();
+    const annualRevenue = annualData.reduce((sum, month) => sum + month.faturamento, 0);
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+
+            <MeiLimitProgress currentRevenue={annualRevenue} limit={meiLimit} />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../app/context/AuthContext';
+import { useSettings } from '../../app/context/SettingsContext';
 
 interface DasGuide {
     id: string;
@@ -89,7 +90,7 @@ const DasGenerationModal: React.FC<{ isOpen: boolean; onClose: () => void; onGen
 
 const SettingsPage: React.FC = () => {
     const { logout } = useAuth();
-    const [meiLimit, setMeiLimit] = useState(81000);
+    const { meiLimit, setMeiLimit } = useSettings();
     const [isDasModalOpen, setIsDasModalOpen] = useState(false);
     const [paidDasList, setPaidDasList] = useState<DasGuide[]>(mockPaidDas);
 
@@ -125,7 +126,7 @@ const SettingsPage: React.FC = () => {
                     <div className="space-y-4">
                         <div>
                             <label htmlFor="mei-limit" className="block text-sm font-medium text-gray-300">
-                                Limite de Faturamento MEI [2025]
+                                Limite de Faturamento MEI Anual
                             </label>
                             <div className="mt-1 flex rounded-md shadow-sm">
                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-green-700 bg-green-800 text-gray-400 sm:text-sm">
@@ -139,7 +140,7 @@ const SettingsPage: React.FC = () => {
                                     onChange={(e) => setMeiLimit(Number(e.target.value))}
                                 />
                             </div>
-                             <p className="mt-2 text-xs text-gray-500">Este valor pode ser alterado pelo Administrador do Sistema.</p>
+                             <p className="mt-2 text-xs text-gray-500">Este valor é usado no Dashboard para calcular o progresso do faturamento.</p>
                         </div>
                     </div>
                 </SettingsCard>

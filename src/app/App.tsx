@@ -1,10 +1,12 @@
 
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CompanyProvider } from './context/CompanyContext';
 import { ProfileProvider } from './context/ProfileContext';
+import { SettingsProvider } from './context/SettingsContext';
 
 import MainLayout from '../ui/components/Layout';
 import DashboardPage from '../ui/pages/DashboardPage';
@@ -69,7 +71,9 @@ const App: React.FC = () => {
     <AuthProvider>
       <CompanyProvider>
         <ProfileProvider>
-            <AppRoutes />
+            <SettingsProvider>
+                <AppRoutes />
+            </SettingsProvider>
         </ProfileProvider>
       </CompanyProvider>
     </AuthProvider>
