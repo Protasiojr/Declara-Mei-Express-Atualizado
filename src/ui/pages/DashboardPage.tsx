@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon } from '../components/icons';
+import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon, UserCircleIcon, ClockIcon } from '../components/icons';
 import { useSettings } from '../../app/context/SettingsContext';
 
 const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; status?: string; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
@@ -146,9 +146,58 @@ const MeiLimitProgress: React.FC<{ currentRevenue: number; limit: number }> = ({
 const DashboardPage: React.FC = () => {
     const { meiLimit } = useSettings();
     const annualRevenue = annualData.reduce((sum, month) => sum + month.faturamento, 0);
+    const [loginTime] = useState(new Date());
+    const [sessionDuration, setSessionDuration] = useState('00:00:00');
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const now = new Date();
+            const diff = now.getTime() - loginTime.getTime();
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const format = (n: number) => n.toString().padStart(2, '0');
+
+            setSessionDuration(`${format(hours)}:${format(minutes)}:${format(seconds)}`);
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, [loginTime]);
+
 
     return (
         <div className="space-y-6">
+            <div className="bg-green-900 p-4 rounded-lg shadow-md border border-green-800 flex flex-col sm:flex-row sm:flex-wrap items-center justify-between gap-4 sm:gap-6">
+                <div className="flex items-center gap-3">
+                    <UserCircleIcon className="w-8 h-8 text-green-400 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm text-gray-400">Usuário Logado</p>
+                        <p className="font-semibold text-white">Administrador</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                     <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                        <span className="relative flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-400">Tipo de Usuário</p>
+                        <p className="font-semibold text-white">Admin</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    <ClockIcon className="w-8 h-8 text-green-400 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm text-gray-400">Tempo de Sessão</p>
+                        <p className="font-semibold text-white font-mono">{sessionDuration}</p>
+                    </div>
+                </div>
+            </div>
+
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
 
             <MeiLimitProgress currentRevenue={annualRevenue} limit={meiLimit} />
