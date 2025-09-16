@@ -32,11 +32,24 @@ const StockPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>(mockProducts);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [activeModal, setActiveModal] = useState<'entry' | 'adjust' | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Estado para os formulários dos modais
     const [entryQuantity, setEntryQuantity] = useState('');
     const [adjustQuantity, setAdjustQuantity] = useState('');
     const [adjustReason, setAdjustReason] = useState('');
+
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery) {
+            return products;
+        }
+        const lowercasedQuery = searchQuery.toLowerCase();
+        return products.filter(product =>
+            product.name.toLowerCase().includes(lowercasedQuery) ||
+            (product.barcode && product.barcode.includes(lowercasedQuery))
+        );
+    }, [products, searchQuery]);
+
 
     const handleOpenModal = (product: Product, modalType: 'entry' | 'adjust') => {
         setSelectedProduct(product);
@@ -169,6 +182,22 @@ const StockPage: React.FC = () => {
 
             <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                 <h2 className="text-xl font-semibold text-white mb-4">Inventário de Produtos</h2>
+
+                <div className="relative mb-4">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Buscar produto por nome ou código de barras..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-green-950 border border-green-700 rounded-lg py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    />
+                </div>
+
                  <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-300">
                         <thead className="text-xs text-gray-400 uppercase bg-green-800">
@@ -181,29 +210,37 @@ const StockPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {products.map(product => {
-                                const status = getStockStatus(product);
-                                return (
-                                    <tr key={product.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700/50">
-                                        <th scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">{product.name}</th>
-                                        <td className="px-6 py-4 text-center font-mono">{product.stock} {product.unit}</td>
-                                        <td className="px-6 py-4 text-center font-mono">{product.minStock} {product.unit}</td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${status.color}`}>
-                                                {status.text}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-center space-x-2">
-                                            <button onClick={() => handleOpenModal(product, 'entry')} className="p-2 rounded-md bg-blue-600/50 text-blue-300 hover:bg-blue-600/80" title="Registrar Entrada">
-                                                <PlusIcon className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={() => handleOpenModal(product, 'adjust')} className="p-2 rounded-md bg-yellow-600/50 text-yellow-300 hover:bg-yellow-600/80" title="Ajuste Manual">
-                                                <WrenchIcon className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map(product => {
+                                    const status = getStockStatus(product);
+                                    return (
+                                        <tr key={product.id} className="bg-green-900 border-b border-green-800 hover:bg-green-700/50">
+                                            <th scope="row" className="px-6 py-4 font-medium text-white whitespace-nowrap">{product.name}</th>
+                                            <td className="px-6 py-4 text-center font-mono">{product.stock} {product.unit}</td>
+                                            <td className="px-6 py-4 text-center font-mono">{product.minStock} {product.unit}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${status.color}`}>
+                                                    {status.text}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center space-x-2">
+                                                <button onClick={() => handleOpenModal(product, 'entry')} className="p-2 rounded-md bg-blue-600/50 text-blue-300 hover:bg-blue-600/80" title="Registrar Entrada">
+                                                    <PlusIcon className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => handleOpenModal(product, 'adjust')} className="p-2 rounded-md bg-yellow-600/50 text-yellow-300 hover:bg-yellow-600/80" title="Ajuste Manual">
+                                                    <WrenchIcon className="w-4 h-4" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-4 text-center text-gray-400">
+                                        Nenhum produto encontrado.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
