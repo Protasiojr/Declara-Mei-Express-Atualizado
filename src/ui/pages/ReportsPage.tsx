@@ -132,6 +132,37 @@ const ReportsPage: React.FC = () => {
         generatePdf('Relatório Mensal de Faturamento', head, body, 'relatorio_faturamento_mensal');
     };
 
+    const handleGenerateDailyBilling = () => {
+        const total = 365.50;
+        const head = [['Hora', 'Descrição', 'Valor (R$)']];
+        const body = [
+            ['10:15', 'Venda PDV #123', '45.50'],
+            ['11:30', 'Venda PDV #124', '120.00'],
+            ['14:00', 'Serviço Y', '200.00'],
+            ['', '', ''],
+            [{ content: 'Total Diário', styles: { fontStyle: 'bold' } }, '', { content: total.toFixed(2), styles: { fontStyle: 'bold' } }]
+        ];
+        generatePdf('Relatório Diário de Faturamento (Mock)', head, body, 'relatorio_faturamento_diario');
+    };
+
+    const handleGenerateAnnualBilling = () => {
+        const annualData = [
+            { name: 'Jan', faturamento: 4000 }, { name: 'Fev', faturamento: 3000 },
+            { name: 'Mar', faturamento: 5000 }, { name: 'Abr', faturamento: 4500 },
+            { name: 'Mai', faturamento: 6000 }, { name: 'Jun', faturamento: 5500 },
+            { name: 'Jul', faturamento: 7000 }, { name: 'Ago', faturamento: 6500 },
+            { name: 'Set', faturamento: 7200 }, { name: 'Out', faturamento: 8000 },
+            { name: 'Nov', faturamento: 7500 }, { name: 'Dez', faturamento: 9000 },
+        ];
+        const totalAnual = annualData.reduce((sum, month) => sum + month.faturamento, 0);
+
+        const head = [['Descrição', 'Valor (R$)']];
+        const body = [
+             ['Faturamento Bruto Anual (Mock)', totalAnual.toFixed(2)]
+        ];
+        generatePdf('Relatório Anual de Faturamento', head, body, 'relatorio_faturamento_anual');
+    };
+
     const handleGenerateAnnualDeclaration = () => {
         const salesRevenue = mockReceivables.reduce((sum, r) => sum + r.value, 0);
         // Simulate revenue separation for MEI
@@ -194,14 +225,20 @@ const ReportsPage: React.FC = () => {
 
                 <ReportCard title="Outros Relatórios">
                      <div className="flex flex-col space-y-4">
-                         <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
+                        <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
+                           <span>Relatório Diário de Faturamento</span> <GenerateButton onClick={handleGenerateDailyBilling} />
+                        </div>
+                        <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
+                           <span>Relatório Mensal de Faturamento</span> <GenerateButton onClick={handleGenerateMonthlyBilling} />
+                        </div>
+                        <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
+                           <span>Relatório Anual de Faturamento</span> <GenerateButton onClick={handleGenerateAnnualBilling} />
+                        </div>
+                        <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
                             <span>Relatório de Sessões de Caixa</span> <GenerateButton onClick={handleGenerateCashierSessions} />
                         </div>
                         <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
                             <span>Lista de Clientes</span> <GenerateButton onClick={handleGenerateCustomers} />
-                        </div>
-                         <div className="flex justify-between items-center bg-green-800/50 p-3 rounded-md">
-                            <span>Relatório Mensal de Faturamento</span> <GenerateButton onClick={handleGenerateMonthlyBilling} />
                         </div>
                     </div>
                 </ReportCard>
