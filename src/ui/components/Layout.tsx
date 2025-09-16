@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
 import { useCompany } from '../../app/context/CompanyContext';
+import { useProfile } from '../../app/context/ProfileContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
@@ -78,6 +79,16 @@ const Sidebar: React.FC<{ isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boo
 
 const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { logout } = useAuth();
+    const { profileImage } = useProfile();
+
+    const UserProfileIcon = () => (
+        <div className="w-8 h-8 rounded-full bg-green-800 flex items-center justify-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+        </div>
+    );
+
     return (
         <header className="h-16 bg-green-900 text-gray-300 flex items-center justify-between lg:justify-end px-4 sm:px-6 border-b border-green-800">
             <button
@@ -90,7 +101,11 @@ const Header: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
             <div className="flex items-center space-x-4">
                 <div className="relative">
                     <button className="flex items-center space-x-2">
-                        <img className="w-8 h-8 rounded-full" src="https://picsum.photos/100" alt="User" />
+                        {profileImage ? (
+                            <img className="w-8 h-8 rounded-full object-cover" src={profileImage} alt="Foto de perfil" />
+                        ) : (
+                            <UserProfileIcon />
+                        )}
                         <span>Admin</span>
                         <ChevronDownIcon className="w-4 h-4" />
                     </button>

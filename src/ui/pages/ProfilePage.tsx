@@ -1,6 +1,39 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useProfile } from '../../app/context/ProfileContext';
 
 const ProfilePage: React.FC = () => {
+    const { profileImage, setProfileImage } = useProfile();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const imageUrl = reader.result as string;
+                setProfileImage(imageUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleButtonClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        alert('Perfil salvo com sucesso!');
+    };
+
+    const UserProfileIcon = () => (
+        <div className="w-32 h-32 rounded-full bg-green-800 flex items-center justify-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+        </div>
+    );
+
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold text-white">Meu Perfil</h1>
@@ -8,14 +41,25 @@ const ProfilePage: React.FC = () => {
             <div className="bg-green-900 p-8 rounded-lg shadow-md border border-green-800">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                     {/* Profile Picture */}
-                    <div className="flex-shrink-0">
-                        <img className="w-32 h-32 rounded-full object-cover" src="https://picsum.photos/200" alt="Profile" />
-                        <button className="mt-4 w-full text-sm text-green-400 hover:text-green-300">Alterar Imagem</button>
+                    <div className="flex-shrink-0 text-center">
+                         {profileImage ? (
+                            <img className="w-32 h-32 rounded-full object-cover" src={profileImage} alt="Foto de perfil do usuário" />
+                        ) : (
+                            <UserProfileIcon />
+                        )}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleImageChange}
+                            className="hidden"
+                            accept="image/png, image/jpeg"
+                        />
+                        <button onClick={handleButtonClick} className="mt-4 w-full text-sm text-green-400 hover:text-green-300">Alterar Imagem</button>
                     </div>
 
                     {/* Profile Form */}
                     <div className="flex-grow w-full">
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
                              <div>
                                 <label className="block text-sm font-medium text-gray-400">Nome do Perfil</label>
                                 <input type="text" defaultValue="Administrador" className="mt-1 block w-full bg-green-800 border-green-700 rounded-md text-white" />

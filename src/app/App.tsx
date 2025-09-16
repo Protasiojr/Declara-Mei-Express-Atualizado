@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CompanyProvider } from './context/CompanyContext';
+import { ProfileProvider } from './context/ProfileContext';
 
 import MainLayout from '../ui/components/Layout';
 import DashboardPage from '../ui/pages/DashboardPage';
@@ -67,7 +68,9 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <CompanyProvider>
-        <AppRoutes />
+        <ProfileProvider>
+            <AppRoutes />
+        </ProfileProvider>
       </CompanyProvider>
     </AuthProvider>
   );
