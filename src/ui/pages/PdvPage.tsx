@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCompany } from '../../app/context/CompanyContext';
 import { PlusCircleIcon, BarcodeIcon, Trash2Icon, PlusIcon, MinusIcon, ArrowUpCircleIcon, ArrowDownCircleIcon, PrinterIcon } from '../components/icons';
 import { Customer, CustomerType, Address } from '../../domain/types';
@@ -82,8 +83,22 @@ type ActiveModal = 'openCashier' | 'payment' | 'history' | 'movements' | 'closeC
 const quickProducts = searchablePdvItems.filter(item => item.type === 'product').slice(0, 10) as SearchableProduct[];
 
 const PdvPage: React.FC = () => {
-    const [isCashierOpen, setIsCashierOpen] = useState(false);
-    const [cashierOpenTime, setCashierOpenTime] = useState<string | null>(null);
+    const initialCashierData = useMemo(() => {
+        try {
+            const storedStatus = localStorage.getItem('cashierStatus');
+            if (storedStatus) {
+                const { isOpen, openTime } = JSON.parse(storedStatus);
+                return { isOpen, openTime: isOpen ? openTime : null };
+            }
+        } catch (error) {
+            console.error("Failed to parse cashierStatus from localStorage", error);
+        }
+        return { isOpen: false, openTime: null };
+    }, []);
+
+    const [isCashierOpen, setIsCashierOpen] = useState(initialCashierData.isOpen);
+    const navigate = useNavigate();
+    const [cashierOpenTime, setCashierOpenTime] = useState<string | null>(initialCashierData.openTime);
     const [activeModal, setActiveModal] = useState<ActiveModal>(null);
     const [cart, setCart] = useState<CartItem[]>([]);
     const [initialBalance, setInitialBalance] = useState(0);
@@ -123,6 +138,12 @@ const PdvPage: React.FC = () => {
 
     const handleOpenCashier = (balance: number) => {
         const timestamp = new Date().toLocaleString('pt-BR');
+        const openTime = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        try {
+            localStorage.setItem('cashierStatus', JSON.stringify({ isOpen: true, openTime }));
+        } catch (error) {
+            console.error("Failed to set cashierStatus in localStorage", error);
+        }
         setInitialBalance(balance);
         setCashierMovements([{ id: `mov-0`, type: 'Entrada', description: 'Saldo Inicial', amount: balance, timestamp }]);
         setCashierOpenTime(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
@@ -223,6 +244,11 @@ const PdvPage: React.FC = () => {
     };
 
     const handleCloseCashier = () => {
+        try {
+            localStorage.removeItem('cashierStatus');
+        } catch (error) {
+            console.error("Failed to remove cashierStatus from localStorage", error);
+        }
         setIsCashierOpen(false);
         setCart([]);
         setSelectedCustomer(null);
@@ -237,7 +263,7 @@ const PdvPage: React.FC = () => {
 
     const renderModal = () => {
         switch (activeModal) {
-            case 'openCashier': return <OpenCashierModal onOpen={handleOpenCashier} />;
+            case 'openCashier': return <OpenCashierModal onOpen={handleOpenCashier} onCancel={() => navigate('/dashboard')} />;
             case 'payment': return <PaymentModal total={total} onCancel={() => { setActiveModal(null); setSelectedCustomer(null); }} onFinalize={handleFinalizeSale} customers={customers} selectedCustomer={selectedCustomer} onSelectCustomer={setSelectedCustomer} onAddNewCustomer={() => setActiveModal('newCustomer')} />;
             case 'history': return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
             case 'movements': return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
@@ -397,7 +423,7 @@ const Modal: React.FC<{ title: string; children: React.ReactNode; footer: React.
     </div>
 );
 
-const OpenCashierModal: React.FC<{ onOpen: (balance: number) => void }> = ({ onOpen }) => {
+const OpenCashierModal: React.FC<{ onOpen: (balance: number) => void; onCancel: () => void; }> = ({ onOpen, onCancel }) => {
     const [balance, setBalance] = useState('');
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -405,7 +431,8 @@ const OpenCashierModal: React.FC<{ onOpen: (balance: number) => void }> = ({ onO
     };
     return (
         <Modal title="Abrir Caixa" footer={
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+                <button type="button" onClick={onCancel} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
                 <button type="submit" form="open-cashier-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Abrir Caixa</button>
             </div>
         }>

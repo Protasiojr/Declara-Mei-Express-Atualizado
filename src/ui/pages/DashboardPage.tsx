@@ -3,13 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon, UserCircleIcon, ClockIcon } from '../components/icons';
 import { useSettings } from '../../app/context/SettingsContext';
 
-const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; status?: string; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
+const StatCard: React.FC<{ title: string; value: React.ReactNode; icon: React.ReactNode; status?: string; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
         <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-gray-400">{title}</h3>
             {icon}
         </div>
-        <p className="text-3xl font-semibold text-white mt-2">{value}</p>
+        <div className="text-3xl font-semibold text-white mt-2">{value}</div>
         {status && <p className={`text-xs mt-2 ${statusColor}`}>{status}</p>}
     </div>
 );
@@ -147,7 +147,30 @@ const DashboardPage: React.FC = () => {
     const { meiLimit } = useSettings();
     const annualRevenue = annualData.reduce((sum, month) => sum + month.faturamento, 0);
     const [loginTime] = useState(new Date());
+    const [cashierState, setCashierState] = useState({ isOpen: false, openTime: '' });
     const [sessionDuration, setSessionDuration] = useState('00:00:00');
+
+    useEffect(() => {
+        const checkCashierStatus = () => {
+            try {
+                const storedStatus = localStorage.getItem('cashierStatus');
+                if (storedStatus) {
+                    const { isOpen, openTime } = JSON.parse(storedStatus);
+                    setCashierState({ isOpen, openTime });
+                } else {
+                    setCashierState({ isOpen: false, openTime: '' });
+                }
+            } catch (e) {
+                console.error("Failed to parse cashierStatus from localStorage", e);
+                setCashierState({ isOpen: false, openTime: '' });
+            }
+        };
+
+        checkCashierStatus();
+        window.addEventListener('storage', checkCashierStatus);
+
+        return () => window.removeEventListener('storage', checkCashierStatus);
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -204,12 +227,20 @@ const DashboardPage: React.FC = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard 
-                    title="Estado do Caixa" 
-                    value="Aberto" 
-                    status="Desde 08:00" 
-                    statusColor="text-green-400" 
-                    icon={<ArchiveIcon className="w-6 h-6 text-green-400" />} 
+                <StatCard
+                    title="Estado do Caixa"
+                    value={
+                        <div className="flex items-center gap-2">
+                            <span className={`relative flex h-3 w-3`}>
+                                {cashierState.isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
+                                <span className={`relative inline-flex rounded-full h-3 w-3 ${cashierState.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                            </span>
+                            <span>{cashierState.isOpen ? 'Aberto' : 'Fechado'}</span>
+                        </div>
+                    }
+                    status={cashierState.isOpen ? `Desde ${cashierState.openTime}` : ''}
+                    statusColor={cashierState.isOpen ? "text-green-400" : "text-gray-400"}
+                    icon={<ArchiveIcon className={`w-6 h-6 ${cashierState.isOpen ? 'text-green-400' : 'text-gray-500'}`} />}
                 />
                 <StatCard 
                     title="Contas a Pagar" 
