@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompany } from '../../app/context/CompanyContext';
@@ -115,12 +116,16 @@ const PdvPage: React.FC = () => {
 
     useEffect(() => {
         if (!isCashierOpen) {
-            setActiveModal('openCashier');
+            const hasActiveSession = localStorage.getItem('cashierStatus');
+            if (!hasActiveSession) {
+                setActiveModal('openCashier');
+            }
         } else {
             setActiveModal(null);
             searchInputRef.current?.focus();
         }
     }, [isCashierOpen]);
+
 
     useEffect(() => {
         if (searchQuery.length > 1) {
@@ -259,6 +264,31 @@ const PdvPage: React.FC = () => {
         setActiveModal(null);
     }
 
+    const handleSendManagerEmail = (summary: { sales: number; supplies: number; withdrawals: number; expectedCash: number; }) => {
+        const managerEmail = "gestor@empresa.com"; // Hardcoded from settings page
+    
+        const emailBody = `
+    Resumo do Fechamento de Caixa
+    ---------------------------------
+    Data: ${new Date().toLocaleString('pt-BR')}
+    Operador: Admin
+    ---------------------------------
+    - Saldo Inicial: R$ ${initialBalance.toFixed(2)}
+    - Vendas (Total): R$ ${summary.sales.toFixed(2)}
+    - Suprimentos: + R$ ${summary.supplies.toFixed(2)}
+    - Sangrias: - R$ ${summary.withdrawals.toFixed(2)}
+    ---------------------------------
+    Valor Esperado em Caixa: R$ ${summary.expectedCash.toFixed(2)}
+        `.trim().replace(/^\s+/gm, '');
+    
+        console.log("--- SIMULAÇÃO DE ENVIO DE EMAIL ---");
+        console.log(`Para: ${managerEmail}`);
+        console.log("Assunto: Fechamento de Caixa");
+        console.log(emailBody);
+    
+        alert(`Email com o resumo do caixa enviado para ${managerEmail}. (Simulação)`);
+    };
+
     const total = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart]);
 
     const renderModal = () => {
@@ -268,7 +298,7 @@ const PdvPage: React.FC = () => {
             case 'history': return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
             case 'movements': return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
             // FIX: Replaced incorrect component name with correct one.
-            case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} />;
+            case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} onSendEmail={handleSendManagerEmail} />;
             // FIX: Replaced incorrect component name with correct one.
             case 'newCustomer': return <CustomerModal isOpen={true} onClose={() => setActiveModal('payment')} onSave={handleSaveNewCustomer} customerToEdit={null} />;
             // FIX: Replaced incorrect component name with correct one.
@@ -602,7 +632,8 @@ const CloseCashierModal: React.FC<{
     initialBalance: number;
     onClose: () => void;
     onConfirm: () => void;
-}> = ({ movements, initialBalance, onClose, onConfirm }) => {
+    onSendEmail: (summary: { sales: number; supplies: number; withdrawals: number; expectedCash: number; }) => void;
+}> = ({ movements, initialBalance, onClose, onConfirm, onSendEmail }) => {
     const summary = useMemo(() => {
         const sales = movements.filter(m => m.description.startsWith('Venda')).reduce((sum, m) => sum + m.amount, 0);
         const cashEntries = movements.filter(m => m.type === 'Entrada' && m.description.includes('(Dinheiro)')).reduce((sum, m) => sum + m.amount, 0);
@@ -615,9 +646,15 @@ const CloseCashierModal: React.FC<{
 
     return (
         <Modal title="Fechar Caixa" size="max-w-lg" footer={
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
                 <button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Cancelar</button>
-                <button onClick={onConfirm} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-500 font-semibold text-white">Confirmar Fechamento</button>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => onSendEmail(summary)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 font-semibold text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <span>Enviar Email</span>
+                    </button>
+                    <button onClick={onConfirm} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-500 font-semibold text-white">Confirmar Fechamento</button>
+                </div>
             </div>
         }>
             <div className="space-y-3 text-white">
