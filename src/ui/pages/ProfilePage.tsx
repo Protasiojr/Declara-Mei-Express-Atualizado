@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useProfile } from '../../app/context/ProfileContext';
 
 const ProfilePage: React.FC = () => {
     const { profileImage, setProfileImage } = useProfile();
+    const [profileType, setProfileType] = useState('Administrador');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +55,9 @@ const ProfilePage: React.FC = () => {
                             className="hidden"
                             accept="image/png, image/jpeg"
                         />
-                        <button onClick={handleButtonClick} className="mt-4 w-full text-sm text-green-400 hover:text-green-300">Alterar Imagem</button>
+                        <button onClick={handleButtonClick} className="mt-4 w-full bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600">
+                            Alterar Imagem
+                        </button>
                     </div>
 
                     {/* Profile Form */}
@@ -73,8 +76,16 @@ const ProfilePage: React.FC = () => {
                                 <input type="password" placeholder="Deixe em branco para não alterar" className="mt-1 block w-full bg-green-800 border-green-700 rounded-md text-white" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-400">Tipo de Perfil</label>
-                                <input type="text" value="Administrador" disabled className="mt-1 block w-full bg-green-950 border-green-800 rounded-md text-gray-400 cursor-not-allowed" />
+                                <label htmlFor="profileType" className="block text-sm font-medium text-gray-400">Tipo de Perfil</label>
+                                <select
+                                    id="profileType"
+                                    value={profileType}
+                                    onChange={(e) => setProfileType(e.target.value)}
+                                    className="mt-1 block w-full bg-green-800 border-green-700 rounded-md text-white focus:ring-green-500 focus:border-green-500"
+                                >
+                                    <option>Administrador</option>
+                                    <option>Usuário</option>
+                                </select>
                             </div>
                             <div className="pt-4 flex justify-end">
                                 <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700">
