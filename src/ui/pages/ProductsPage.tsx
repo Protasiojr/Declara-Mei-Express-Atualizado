@@ -1,11 +1,11 @@
 
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { PlusCircleIcon, PackageIcon } from '../components/icons';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { PlusCircleIcon, PackageIcon, BarcodeIcon, ClockIcon, WrenchIcon, Trash2Icon, ChevronDownIcon } from '../components/icons';
 import { mockProducts, mockServices } from '../../data/mocks';
 import { Product, Service, ProductType } from '../../domain/types';
 
-const InputField = ({ label, name, type = 'text', value, onChange, required = false, step, className = '' }: { label: string, name: string, type?: string, value?: string | number, onChange: (e: any) => void, required?: boolean, step?: string, className?: string }) => (
+const InputField = ({ label, name, type = 'text', value, onChange, required = false, step, className = '', disabled = false }: { label: string, name: string, type?: string, value?: string | number, onChange: (e: any) => void, required?: boolean, step?: string, className?: string, disabled?: boolean }) => (
     <div className={className}>
         <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
         <input
@@ -16,12 +16,13 @@ const InputField = ({ label, name, type = 'text', value, onChange, required = fa
             onChange={onChange}
             required={required}
             step={step}
-            className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-white"
+            disabled={disabled}
+            className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-white disabled:bg-green-950 disabled:cursor-not-allowed"
         />
     </div>
 );
 
-const TextAreaField = ({ label, name, value, onChange, rows = 3 }: { label: string, name: string, value?: string, onChange: (e: any) => void, rows?: number }) => (
+const TextAreaField = ({ label, name, value, onChange, rows = 3, required = false }: { label: string, name: string, value?: string, onChange: (e: any) => void, rows?: number, required?: boolean }) => (
     <div>
         <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
         <textarea
@@ -30,6 +31,7 @@ const TextAreaField = ({ label, name, value, onChange, rows = 3 }: { label: stri
             value={value || ''}
             onChange={onChange}
             rows={rows}
+            required={required}
             className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-white"
         />
     </div>
@@ -50,7 +52,6 @@ const SelectField = ({ label, name, value, onChange, children }: { label: string
     </div>
 );
 
-
 const initialProductState: Product = {
     id: '',
     name: '',
@@ -67,6 +68,7 @@ const initialProductState: Product = {
     image: '',
 };
 
+// MODALS
 const ProductModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
@@ -105,7 +107,6 @@ const ProductModal: React.FC<{
     };
 
     const handleGenerateBarcode = () => {
-        // EAN-13 like structure (not a valid checksum, just random 13 digits)
         const barcode = Math.floor(1000000000000 + Math.random() * 9000000000000).toString();
         setProduct(prev => ({ ...prev, barcode: barcode }));
     };
@@ -123,7 +124,7 @@ const ProductModal: React.FC<{
                 <div className="p-6 border-b border-green-800">
                     <h2 className="text-2xl font-bold text-white">{productToEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}</h2>
                 </div>
-                <form onSubmit={handleSubmit} className="overflow-y-auto flex-grow p-6 space-y-6">
+                <form onSubmit={handleSubmit} id="product-form" className="overflow-y-auto flex-grow p-6 space-y-6">
                     <div className="flex flex-col md:flex-row gap-6">
                         <div className="md:w-1/3 flex flex-col items-center space-y-4">
                             {imagePreview ? (
@@ -157,7 +158,7 @@ const ProductModal: React.FC<{
                                         onClick={handleGenerateBarcode}
                                         className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-green-700 bg-green-700 text-white hover:bg-green-600 text-sm whitespace-nowrap"
                                     >
-                                        Gerar Código de Barras
+                                        Gerar Código
                                     </button>
                                 </div>
                             </div>
@@ -183,7 +184,112 @@ const ProductModal: React.FC<{
                 </form>
                 <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg flex justify-end space-x-4">
                     <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
-                    <button type="submit" onClick={handleSubmit} className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Salvar</button>
+                    <button type="submit" form="product-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Salvar</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ViewCodeModal: React.FC<{ product: Product; onClose: () => void }> = ({ product, onClose }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+        <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-md border border-green-800">
+            <div className="p-6 border-b border-green-800"><h2 className="text-xl font-bold text-white truncate">Códigos: {product.name}</h2></div>
+            <div className="p-6 space-y-4">
+                <div><h3 className="text-sm font-medium text-gray-400">Código de Barras (EAN)</h3><p className="text-lg font-mono text-white bg-green-800/50 p-2 rounded-md mt-1">{product.barcode || 'N/A'}</p></div>
+                <div><h3 className="text-sm font-medium text-gray-400">SKU / Código Interno</h3><p className="text-lg font-mono text-white bg-green-800/50 p-2 rounded-md mt-1">{product.sku}</p></div>
+            </div>
+            <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg text-right"><button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Fechar</button></div>
+        </div>
+    </div>
+);
+
+const HistoryModal: React.FC<{ product: Product; onClose: () => void }> = ({ product, onClose }) => {
+    // Mock data for demonstration
+    const mockHistory = [
+        { date: '25/07/2024', type: 'Venda PDV', quantityChange: -5, user: 'Admin' },
+        { date: '22/07/2024', type: 'Ajuste Manual', quantityChange: -1, user: 'Admin', notes: 'Avaria' },
+        { date: '20/07/2024', type: 'Entrada de Estoque', quantityChange: 50, user: 'Admin', notes: 'NF-e 12345' },
+        { date: '01/01/2024', type: 'Criação', quantityChange: product.stock + 6, user: 'Sistema' },
+    ];
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-2xl border border-green-800 max-h-[90vh] flex flex-col">
+                <div className="p-6 border-b border-green-800"><h2 className="text-xl font-bold text-white truncate">Histórico: {product.name}</h2></div>
+                <div className="p-6 space-y-4 overflow-y-auto">
+                    <ul className="space-y-3">
+                        {mockHistory.map((item, index) => (
+                            <li key={index} className="flex items-start p-3 bg-green-800/50 rounded-lg">
+                                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center mr-4 ${item.quantityChange > 0 ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                                    {item.quantityChange > 0 ? '+' : ''}{item.quantityChange}
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-white">{item.type}</p>
+                                    <p className="text-sm text-gray-400">{item.date} por {item.user}</p>
+                                    {item.notes && <p className="text-xs text-gray-500 mt-1">Nota: {item.notes}</p>}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg text-right"><button onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Fechar</button></div>
+            </div>
+        </div>
+    );
+};
+
+const AdjustStockModal: React.FC<{ product: Product; onClose: () => void; onSave: (productId: string, newStock: number, reason: string) => void; }> = ({ product, onClose, onSave }) => {
+    const [newStock, setNewStock] = useState(product.stock.toString());
+    const [reason, setReason] = useState('');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSave(product.id, Number(newStock), reason);
+    };
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-md border border-green-800">
+                <div className="p-6 border-b border-green-800"><h2 className="text-xl font-bold text-white truncate">Ajustar Estoque: {product.name}</h2></div>
+                <form onSubmit={handleSubmit} id="adjust-stock-form">
+                    <div className="p-6 space-y-4">
+                        <InputField label="Estoque Atual" name="currentStock" value={product.stock} onChange={() => { }} disabled />
+                        <InputField label="Nova Quantidade em Estoque" name="newStock" type="number" value={newStock} onChange={(e) => setNewStock(e.target.value)} required />
+                        <SelectField label="Motivo do Ajuste" name="reason" value={reason} onChange={(e) => setReason(e.target.value)}>
+                            <option value="">Selecione um motivo</option>
+                            <option value="Contagem de inventário">Contagem de inventário</option>
+                            <option value="Perda ou Dano">Perda ou Dano</option>
+                            <option value="Avaria">Avaria</option>
+                            <option value="Outro">Outro</option>
+                        </SelectField>
+                    </div>
+                </form>
+                <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg flex justify-end space-x-4">
+                    <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
+                    <button type="submit" form="adjust-stock-form" disabled={!reason} className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Salvar Ajuste</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const DeleteConfirmModal: React.FC<{ product: Product; onClose: () => void; onConfirm: (productId: string, reason: string) => void; }> = ({ product, onClose, onConfirm }) => {
+    const [reason, setReason] = useState('');
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onConfirm(product.id, reason);
+    };
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-lg border border-red-800">
+                <div className="p-6 border-b border-red-800"><h2 className="text-xl font-bold text-red-400">Confirmar Exclusão</h2></div>
+                <form onSubmit={handleSubmit} id="delete-form">
+                    <div className="p-6 space-y-4">
+                        <p className="text-gray-300">Você tem certeza que deseja excluir o produto <strong className="text-white">{product.name}</strong>? Esta ação não pode ser desfeita.</p>
+                        <TextAreaField label="Motivo da Exclusão" name="reason" value={reason} onChange={(e) => setReason(e.target.value)} required />
+                    </div>
+                </form>
+                <div className="p-4 bg-green-950/50 border-t border-red-800 rounded-b-lg flex justify-end space-x-4">
+                    <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
+                    <button type="submit" form="delete-form" disabled={!reason.trim()} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed">Excluir Produto</button>
                 </div>
             </div>
         </div>
@@ -194,8 +300,10 @@ const ProductsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('products');
     const [searchQuery, setSearchQuery] = useState('');
     const [products, setProducts] = useState<Product[]>(mockProducts);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+    const [selectedProductForAction, setSelectedProductForAction] = useState<Product | null>(null);
+    const [activeActionModal, setActiveActionModal] = useState<'viewCode' | 'history' | 'adjustStock' | 'deleteConfirm' | null>(null);
 
     const filteredProducts = useMemo(() => products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -206,28 +314,55 @@ const ProductsPage: React.FC = () => {
         service.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleOpenModal = (product: Product | null) => {
+    const handleOpenProductModal = (product: Product | null) => {
         setProductToEdit(product);
-        setIsModalOpen(true);
+        setIsProductModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleCloseProductModal = () => {
+        setIsProductModalOpen(false);
         setProductToEdit(null);
     };
+    
+    const handleOpenActionModal = (product: Product, modalType: 'viewCode' | 'history' | 'adjustStock' | 'deleteConfirm') => {
+        setSelectedProductForAction(product);
+        setActiveActionModal(modalType);
+    };
 
+    const handleCloseActionModal = () => {
+        setSelectedProductForAction(null);
+        setActiveActionModal(null);
+    };
+    
     const handleSaveProduct = (product: Product) => {
         if (productToEdit) {
             setProducts(products.map(p => p.id === product.id ? product : p));
         } else {
-            setProducts([...products, product]);
+            setProducts([...products, { ...product, id: new Date().toISOString() }]);
         }
-        handleCloseModal();
+        handleCloseProductModal();
     };
     
-    const handleDeleteProduct = (id: string) => {
-        if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-            setProducts(products.filter(p => p.id !== id));
+    const handleConfirmDelete = (productId: string, reason: string) => {
+        console.log(`Excluindo produto ${productId} pelo motivo: ${reason}`);
+        setProducts(products.filter(p => p.id !== productId));
+        handleCloseActionModal();
+    };
+
+    const handleConfirmAdjustStock = (productId: string, newStock: number, reason: string) => {
+        console.log(`Ajustando estoque para ${productId} para ${newStock}. Motivo: ${reason}`);
+        setProducts(products.map(p => p.id === productId ? { ...p, stock: newStock } : p));
+        handleCloseActionModal();
+    };
+
+    const renderActionModals = () => {
+        if (!selectedProductForAction) return null;
+        switch (activeActionModal) {
+            case 'viewCode': return <ViewCodeModal product={selectedProductForAction} onClose={handleCloseActionModal} />;
+            case 'history': return <HistoryModal product={selectedProductForAction} onClose={handleCloseActionModal} />;
+            case 'adjustStock': return <AdjustStockModal product={selectedProductForAction} onClose={handleCloseActionModal} onSave={handleConfirmAdjustStock} />;
+            case 'deleteConfirm': return <DeleteConfirmModal product={selectedProductForAction} onClose={handleCloseActionModal} onConfirm={handleConfirmDelete} />;
+            default: return null;
         }
     };
 
@@ -235,15 +370,16 @@ const ProductsPage: React.FC = () => {
     return (
         <div className="space-y-6">
             <ProductModal 
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
+                isOpen={isProductModalOpen}
+                onClose={handleCloseProductModal}
                 onSave={handleSaveProduct}
                 productToEdit={productToEdit}
             />
+            {renderActionModals()}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h1 className="text-3xl font-bold text-white">Produtos e Serviços</h1>
                 <button 
-                    onClick={() => activeTab === 'products' ? handleOpenModal(null) : alert('Adicionar serviço não implementado.')}
+                    onClick={() => activeTab === 'products' ? handleOpenProductModal(null) : alert('Adicionar serviço não implementado.')}
                     className="flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 w-full sm:w-auto"
                 >
                     <PlusCircleIcon className="w-5 h-5 mr-2" />
@@ -268,33 +404,47 @@ const ProductsPage: React.FC = () => {
 
             <div className="border-b border-green-800">
                 <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button
-                        onClick={() => setActiveTab('products')}
-                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                            activeTab === 'products' ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'
-                        }`}
-                    >
-                        Produtos
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('services')}
-                        className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                            activeTab === 'services' ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'
-                        }`}
-                    >
-                        Serviços
-                    </button>
+                    <button onClick={() => setActiveTab('products')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'products' ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}>Produtos</button>
+                    <button onClick={() => setActiveTab('services')} className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'services' ? 'border-green-500 text-green-400' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-green-600'}`}>Serviços</button>
                 </nav>
             </div>
             
             <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
-                {activeTab === 'products' ? <ProductsTable products={filteredProducts} onEdit={handleOpenModal} onDelete={handleDeleteProduct} /> : <ServicesTable services={filteredServices} />}
+                {activeTab === 'products' ? <ProductsTable products={filteredProducts} onAction={handleOpenActionModal} onEdit={handleOpenProductModal} /> : <ServicesTable services={filteredServices} />}
             </div>
         </div>
     );
 };
 
-const ProductsTable: React.FC<{ products: Product[], onEdit: (product: Product) => void, onDelete: (id: string) => void }> = ({ products, onEdit, onDelete }) => (
+const ActionsDropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) setIsOpen(false);
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [ref]);
+
+    return (
+        <div className="relative inline-block text-left" ref={ref}>
+            <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center w-full rounded-md border border-green-700 shadow-sm px-4 py-2 bg-green-800 text-sm font-medium text-gray-300 hover:bg-green-700 focus:outline-none">
+                Ações <ChevronDownIcon className="-mr-1 ml-2 h-5 w-5" />
+            </button>
+            {isOpen && (
+                <div onClick={() => setIsOpen(false)} className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-green-950 ring-1 ring-green-700 focus:outline-none z-10">
+                    <div className="py-1" role="menu" aria-orientation="vertical">{children}</div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ProductsTable: React.FC<{ products: Product[], onAction: (product: Product, action: 'viewCode' | 'history' | 'adjustStock' | 'deleteConfirm') => void, onEdit: (product: Product) => void }> = ({ products, onAction, onEdit }) => {
+    const actionItemClass = "group flex items-center w-full px-4 py-2 text-sm text-left";
+    return (
     <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-gray-300">
             <thead className="text-xs text-gray-400 uppercase bg-green-800">
@@ -303,7 +453,7 @@ const ProductsTable: React.FC<{ products: Product[], onEdit: (product: Product) 
                     <th scope="col" className="px-6 py-3">Categoria</th>
                     <th scope="col" className="px-6 py-3">Preço Venda</th>
                     <th scope="col" className="px-6 py-3">Estoque Atual</th>
-                    <th scope="col" className="px-6 py-3">Ações</th>
+                    <th scope="col" className="px-6 py-3 text-center">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -313,22 +463,23 @@ const ProductsTable: React.FC<{ products: Product[], onEdit: (product: Product) 
                         <td className="px-6 py-4">{p.category}</td>
                         <td className="px-6 py-4">R$ {p.sellPrice.toFixed(2)}</td>
                         <td className="px-6 py-4">{p.stock}</td>
-                        <td className="px-6 py-4 space-x-4">
-                            <button onClick={() => onEdit(p)} className="font-medium text-green-400 hover:underline">Editar</button>
-                            <button onClick={() => onDelete(p.id)} className="font-medium text-red-400 hover:underline">Excluir</button>
+                        <td className="px-6 py-4 text-center">
+                            <ActionsDropdown>
+                                <button onClick={() => onAction(p, 'viewCode')} className={`${actionItemClass} text-gray-300 hover:bg-green-800 hover:text-white`}><BarcodeIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-300" /> Ver Código</button>
+                                <button onClick={() => onAction(p, 'history')} className={`${actionItemClass} text-gray-300 hover:bg-green-800 hover:text-white`}><ClockIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-300" /> Histórico</button>
+                                <button onClick={() => onAction(p, 'adjustStock')} className={`${actionItemClass} text-gray-300 hover:bg-green-800 hover:text-white`}><WrenchIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-300" /> Ajustar Estoque</button>
+                                <button onClick={() => onEdit(p)} className={`${actionItemClass} text-green-400 hover:bg-green-800 hover:text-green-300`}><PackageIcon className="mr-3 h-5 w-5" /> Editar</button>
+                                <button onClick={() => onAction(p, 'deleteConfirm')} className={`${actionItemClass} text-red-400 hover:bg-red-900/50 hover:text-red-300`}><Trash2Icon className="mr-3 h-5 w-5" /> Excluir</button>
+                            </ActionsDropdown>
                         </td>
                     </tr>
                 )) : (
-                    <tr>
-                        <td colSpan={5} className="px-6 py-4 text-center text-gray-400">
-                            Nenhum produto encontrado.
-                        </td>
-                    </tr>
+                    <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-400">Nenhum produto encontrado.</td></tr>
                 )}
             </tbody>
         </table>
     </div>
-);
+)};
 
 const ServicesTable: React.FC<{ services: Service[] }> = ({ services }) => (
     <div className="overflow-x-auto">
@@ -351,11 +502,7 @@ const ServicesTable: React.FC<{ services: Service[] }> = ({ services }) => (
                         </td>
                     </tr>
                 )) : (
-                     <tr>
-                        <td colSpan={3} className="px-6 py-4 text-center text-gray-400">
-                            Nenhum serviço encontrado.
-                        </td>
-                    </tr>
+                     <tr><td colSpan={3} className="px-6 py-4 text-center text-gray-400">Nenhum serviço encontrado.</td></tr>
                 )}
             </tbody>
         </table>
