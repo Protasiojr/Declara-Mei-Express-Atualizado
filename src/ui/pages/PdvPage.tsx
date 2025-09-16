@@ -4,9 +4,9 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompany } from '../../app/context/CompanyContext';
 import { PlusCircleIcon, BarcodeIcon, Trash2Icon, PlusIcon, MinusIcon, ArrowUpCircleIcon, ArrowDownCircleIcon, PrinterIcon } from '../components/icons';
-import { Customer, CustomerType, Address } from '../../domain/types';
+import { Customer, CustomerType, Address, Employee } from '../../domain/types';
 // FIX: Corrected import to use exported member from mocks.
-import { searchablePdvItems, pdvMockCustomers } from '../../data/mocks';
+import { searchablePdvItems, pdvMockCustomers, initialMockEmployees } from '../../data/mocks';
 
 // Define explicit types for searchable items to enable discriminated union type checking.
 // This resolves type errors when accessing properties specific to products (sku, barcode).
@@ -79,7 +79,7 @@ interface CashierMovement {
 }
 type CashMovementType = 'Sangria' | 'Suprimento';
 
-type ActiveModal = 'openCashier' | 'payment' | 'history' | 'movements' | 'closeCashier' | 'newCustomer' | 'cashMovement' | 'receipt' | null;
+type ActiveModal = 'openCashier' | 'payment' | 'history' | 'movements' | 'closeCashier' | 'newCustomer' | 'cashMovement' | 'receipt' | 'postClosure' | null;
 
 const quickProducts = searchablePdvItems.filter(item => item.type === 'product').slice(0, 10) as SearchableProduct[];
 
@@ -88,18 +88,19 @@ const PdvPage: React.FC = () => {
         try {
             const storedStatus = localStorage.getItem('cashierStatus');
             if (storedStatus) {
-                const { isOpen, openTime } = JSON.parse(storedStatus);
-                return { isOpen, openTime: isOpen ? openTime : null };
+                const { isOpen, openTime, operator } = JSON.parse(storedStatus);
+                return { isOpen, openTime: isOpen ? openTime : null, operator: isOpen ? operator : null };
             }
         } catch (error) {
             console.error("Failed to parse cashierStatus from localStorage", error);
         }
-        return { isOpen: false, openTime: null };
+        return { isOpen: false, openTime: null, operator: null };
     }, []);
 
     const [isCashierOpen, setIsCashierOpen] = useState(initialCashierData.isOpen);
     const navigate = useNavigate();
     const [cashierOpenTime, setCashierOpenTime] = useState<string | null>(initialCashierData.openTime);
+    const [operator, setOperator] = useState<string | null>(initialCashierData.operator);
     const [activeModal, setActiveModal] = useState<ActiveModal>(null);
     const [cart, setCart] = useState<CartItem[]>([]);
     const [initialBalance, setInitialBalance] = useState(0);
@@ -141,11 +142,11 @@ const PdvPage: React.FC = () => {
         }
     }, [searchQuery]);
 
-    const handleOpenCashier = (balance: number) => {
+    const handleOpenCashier = (balance: number, selectedOperator: string) => {
         const timestamp = new Date().toLocaleString('pt-BR');
         const openTime = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         try {
-            localStorage.setItem('cashierStatus', JSON.stringify({ isOpen: true, openTime }));
+            localStorage.setItem('cashierStatus', JSON.stringify({ isOpen: true, openTime, operator: selectedOperator }));
         } catch (error) {
             console.error("Failed to set cashierStatus in localStorage", error);
         }
@@ -153,6 +154,7 @@ const PdvPage: React.FC = () => {
         setCashierMovements([{ id: `mov-0`, type: 'Entrada', description: 'Saldo Inicial', amount: balance, timestamp }]);
         setCashierOpenTime(new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
         setIsCashierOpen(true);
+        setOperator(selectedOperator);
     };
 
     const addToCart = (product: { id: string, name: string, price: number }) => {
@@ -248,7 +250,7 @@ const PdvPage: React.FC = () => {
         setActiveModal(null);
     };
 
-    const handleCloseCashier = () => {
+    const finalizeCashierClosure = () => {
         try {
             localStorage.removeItem('cashierStatus');
         } catch (error) {
@@ -261,8 +263,18 @@ const PdvPage: React.FC = () => {
         setCashierMovements([]);
         setSalesHistory([]);
         setCashierOpenTime(null);
-        setActiveModal(null);
-    }
+        setOperator(null);
+        setActiveModal('postClosure');
+    };
+
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    };
+
+    const handleStartNewCashier = () => {
+        setActiveModal('openCashier');
+    };
+
 
     const handleSendManagerEmail = (summary: { sales: number; supplies: number; withdrawals: number; expectedCash: number; }) => {
         const managerEmail = "gestor@empresa.com"; // Hardcoded from settings page
@@ -271,7 +283,7 @@ const PdvPage: React.FC = () => {
     Resumo do Fechamento de Caixa
     ---------------------------------
     Data: ${new Date().toLocaleString('pt-BR')}
-    Operador: Admin
+    Operador: ${operator || 'N/A'}
     ---------------------------------
     - Saldo Inicial: R$ ${initialBalance.toFixed(2)}
     - Vendas (Total): R$ ${summary.sales.toFixed(2)}
@@ -293,18 +305,15 @@ const PdvPage: React.FC = () => {
 
     const renderModal = () => {
         switch (activeModal) {
-            case 'openCashier': return <OpenCashierModal onOpen={handleOpenCashier} onCancel={() => navigate('/dashboard')} />;
+            case 'openCashier': return <OpenCashierModal onOpen={handleOpenCashier} onCancel={() => navigate('/dashboard')} employees={initialMockEmployees} />;
             case 'payment': return <PaymentModal total={total} onCancel={() => { setActiveModal(null); setSelectedCustomer(null); }} onFinalize={handleFinalizeSale} customers={customers} selectedCustomer={selectedCustomer} onSelectCustomer={setSelectedCustomer} onAddNewCustomer={() => setActiveModal('newCustomer')} />;
             case 'history': return <HistoryModal sales={salesHistory} onClose={() => setActiveModal(null)} />;
             case 'movements': return <MovementsModal movements={cashierMovements} onClose={() => setActiveModal(null)} />;
-            // FIX: Replaced incorrect component name with correct one.
-            case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={handleCloseCashier} onSendEmail={handleSendManagerEmail} />;
-            // FIX: Replaced incorrect component name with correct one.
+            case 'closeCashier': return <CloseCashierModal movements={cashierMovements} initialBalance={initialBalance} onClose={() => setActiveModal(null)} onConfirm={finalizeCashierClosure} onSendEmail={handleSendManagerEmail} operator={operator} />;
             case 'newCustomer': return <CustomerModal isOpen={true} onClose={() => setActiveModal('payment')} onSave={handleSaveNewCustomer} customerToEdit={null} />;
-            // FIX: Replaced incorrect component name with correct one.
             case 'cashMovement': return <CashMovementModal type={cashMovementType} onClose={() => setActiveModal(null)} onConfirm={handleAddCashMovement} />;
-            // FIX: Replaced incorrect component name with correct one.
             case 'receipt': return lastSale && <ReceiptModal sale={lastSale} onClose={() => { setLastSale(null); setActiveModal(null); searchInputRef.current?.focus(); }} />;
+            case 'postClosure': return <PostClosureModal onDashboard={handleGoToDashboard} onNewCashier={handleStartNewCashier} />;
             default: return null;
         }
     };
@@ -406,7 +415,7 @@ const PdvPage: React.FC = () => {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-400">Operador:</span>
-                                <span className="text-white font-semibold">Admin</span>
+                                <span className="text-white font-semibold">{operator || 'Nenhum'}</span>
                             </div>
                             {isCashierOpen && (
                                 <>
@@ -441,11 +450,12 @@ const PdvPage: React.FC = () => {
 };
 
 // FIX: Added missing modal component definitions
-const Modal: React.FC<{ title: string; children: React.ReactNode; footer: React.ReactNode; size?: string }> = ({ title, children, footer, size = 'max-w-md' }) => (
+const Modal: React.FC<{ title: string; children: React.ReactNode; footer: React.ReactNode; size?: string; onClose?: () => void }> = ({ title, children, footer, size = 'max-w-md', onClose }) => (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
         <div className={`bg-green-900 rounded-lg shadow-xl w-full ${size} border border-green-800 flex flex-col max-h-[90vh]`}>
-            <div className="p-6 border-b border-green-800">
+            <div className="p-6 border-b border-green-800 flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-white">{title}</h2>
+                {onClose && <button onClick={onClose} className="text-gray-400 hover:text-white text-3xl leading-none" aria-label="Fechar">&times;</button>}
             </div>
             <div className="p-6 overflow-y-auto flex-grow">{children}</div>
             <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg">{footer}</div>
@@ -453,24 +463,56 @@ const Modal: React.FC<{ title: string; children: React.ReactNode; footer: React.
     </div>
 );
 
-const OpenCashierModal: React.FC<{ onOpen: (balance: number) => void; onCancel: () => void; }> = ({ onOpen, onCancel }) => {
+
+const OpenCashierModal: React.FC<{ onOpen: (balance: number, operator: string) => void; onCancel: () => void; employees: Employee[] }> = ({ onOpen, onCancel, employees }) => {
     const [balance, setBalance] = useState('');
+    const [selectedUser, setSelectedUser] = useState(employees.length > 0 ? employees[0].name : '');
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onOpen(parseFloat(balance) || 0);
+        if (!selectedUser) return;
+        onOpen(parseFloat(balance) || 0, selectedUser);
     };
+
     return (
         <Modal title="Abrir Caixa" footer={
             <div className="flex justify-between">
                 <button type="button" onClick={onCancel} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">Cancelar</button>
-                <button type="submit" form="open-cashier-form" className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">Abrir Caixa</button>
+                <button 
+                    type="submit" 
+                    form="open-cashier-form" 
+                    className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={employees.length === 0}
+                >
+                    Abrir Caixa
+                </button>
             </div>
         }>
-            <form id="open-cashier-form" onSubmit={handleSubmit}>
-                <label htmlFor="initial-balance" className="block text-sm font-medium text-gray-300">Saldo Inicial</label>
-                <input type="number" id="initial-balance" value={balance} onChange={e => setBalance(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
-                    placeholder="R$ 0,00" autoFocus required />
+            <form id="open-cashier-form" onSubmit={handleSubmit} className="space-y-4">
+                <p className="text-sm text-gray-400">Para iniciar as operações de venda, informe o valor inicial de troco disponível no caixa. Este valor é conhecido como 'fundo de troco'.</p>
+                <div>
+                    <label htmlFor="user-select" className="block text-sm font-medium text-gray-300">Usuário do Caixa</label>
+                    <select
+                        id="user-select"
+                        value={selectedUser}
+                        onChange={e => setSelectedUser(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white disabled:bg-green-950"
+                        required
+                        disabled={employees.length === 0}
+                    >
+                         {employees.length > 0 ? (
+                            employees.map(user => <option key={user.id} value={user.name}>{user.name}</option>)
+                         ) : (
+                            <option>Nenhum funcionário cadastrado</option>
+                         )}
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="initial-balance" className="block text-sm font-medium text-gray-300">Saldo Inicial</label>
+                    <input type="number" id="initial-balance" value={balance} onChange={e => setBalance(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md text-white"
+                        placeholder="R$ 0,00" autoFocus required />
+                </div>
             </form>
         </Modal>
     );
@@ -633,7 +675,8 @@ const CloseCashierModal: React.FC<{
     onClose: () => void;
     onConfirm: () => void;
     onSendEmail: (summary: { sales: number; supplies: number; withdrawals: number; expectedCash: number; }) => void;
-}> = ({ movements, initialBalance, onClose, onConfirm, onSendEmail }) => {
+    operator: string | null;
+}> = ({ movements, initialBalance, onClose, onConfirm, onSendEmail, operator }) => {
     const summary = useMemo(() => {
         const sales = movements.filter(m => m.description.startsWith('Venda')).reduce((sum, m) => sum + m.amount, 0);
         const cashEntries = movements.filter(m => m.type === 'Entrada' && m.description.includes('(Dinheiro)')).reduce((sum, m) => sum + m.amount, 0);
@@ -660,6 +703,7 @@ const CloseCashierModal: React.FC<{
             <div className="space-y-3 text-white">
                 <p className="text-center text-gray-400">Confira os valores antes de fechar o caixa.</p>
                 <div className="bg-green-800/50 p-4 rounded-lg space-y-2">
+                    <div className="flex justify-between"><span className="text-gray-300">Operador:</span> <span>{operator || 'N/A'}</span></div>
                     <div className="flex justify-between"><span className="text-gray-300">Saldo Inicial:</span> <span>R$ {initialBalance.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span className="text-gray-300">Vendas (Total):</span> <span>R$ {summary.sales.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span className="text-gray-300">Suprimentos:</span> <span className="text-green-400">+ R$ {summary.supplies.toFixed(2)}</span></div>
@@ -755,6 +799,19 @@ const ReceiptModal: React.FC<{ sale: Sale, onClose: () => void }> = ({ sale, onC
         </Modal>
     );
 };
+
+const PostClosureModal: React.FC<{ onDashboard: () => void; onNewCashier: () => void; }> = ({ onDashboard, onNewCashier }) => (
+    <Modal title="Caixa Fechado com Sucesso" onClose={onDashboard} footer={
+        <div className="flex justify-around items-center">
+            <button onClick={onNewCashier} className="px-6 py-3 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold text-base">Abrir Novo Caixa</button>
+            <button onClick={onDashboard} className="px-6 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold text-base">Voltar ao Dashboard</button>
+        </div>
+    }>
+        <div className="text-center text-lg text-gray-300 px-4 py-4">
+            <p>Deseja voltar ao Dashboard ou escolher outro usuário para <strong>abrir um novo caixa</strong>?</p>
+        </div>
+    </Modal>
+);
 
 const CustomerModal: React.FC<{
     isOpen: boolean;
