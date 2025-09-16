@@ -680,6 +680,11 @@ const CashMovementModal: React.FC<{ type: CashMovementType, onClose: () => void,
         onConfirm(type, parseFloat(amount), description);
     };
 
+    const descriptionText = type === 'Sangria' 
+        ? "A sangria é a retirada de dinheiro do caixa para um local seguro, geralmente para diminuir o risco ou para realizar depósitos."
+        : "O suprimento é a adição de dinheiro ao caixa, geralmente para fornecer troco ou reforçar o saldo para as operações do dia.";
+
+
     return (
         <Modal title={type} footer={
             <div className="flex justify-between">
@@ -688,6 +693,7 @@ const CashMovementModal: React.FC<{ type: CashMovementType, onClose: () => void,
             </div>
         }>
             <form id="cash-movement-form" onSubmit={handleSubmit} className="space-y-4">
+                <p className="text-sm text-gray-400">{descriptionText}</p>
                 <div>
                     <label htmlFor="movement-amount" className="block text-sm font-medium text-gray-300">Valor</label>
                     <input type="number" id="movement-amount" value={amount} onChange={e => setAmount(e.target.value)}
