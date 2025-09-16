@@ -221,18 +221,12 @@ const SettingsPage: React.FC = () => {
                     </div>
                 </SettingsCard>
                 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-end items-center">
                      <button
                         onClick={() => {if(confirm('Tem certeza que deseja salvar as alterações?')) alert('Configurações salvas!')}}
                         className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700"
                     >
                         Salvar Configurações
-                    </button>
-                    <button
-                        onClick={logout}
-                        className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700"
-                    >
-                        Sair do Sistema
                     </button>
                 </div>
             </div>

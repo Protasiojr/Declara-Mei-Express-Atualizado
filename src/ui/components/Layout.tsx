@@ -29,6 +29,7 @@ const navItems = [
 const Sidebar: React.FC<{ isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boolean) => void }> = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const { logo } = useCompany();
     const location = useLocation();
+    const { logout } = useAuth();
 
     useEffect(() => {
         setIsSidebarOpen(false);
@@ -69,6 +70,13 @@ const Sidebar: React.FC<{ isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boo
                     ))}
                 </nav>
                 <div className="p-4 border-t border-green-800">
+                    <button
+                        onClick={logout}
+                        className="flex items-center w-full px-4 py-2 mb-4 rounded-lg transition-colors duration-200 text-red-400 hover:bg-red-900/50 hover:text-red-300"
+                    >
+                        <LogOutIcon className="w-5 h-5 mr-3" />
+                        <span>Sair do Sistema</span>
+                    </button>
                     <p className="text-xs text-gray-500">Desenvolvido por João Protásio Jr.</p>
                     <p className="text-xs text-gray-500">Versão 1.0</p>
                 </div>
