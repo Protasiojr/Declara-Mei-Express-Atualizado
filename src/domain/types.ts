@@ -38,6 +38,7 @@ export enum ProductType {
 
 export interface Product {
   id: string;
+  image?: string;
   name: string;
   barcode?: string;
   sku: string;
