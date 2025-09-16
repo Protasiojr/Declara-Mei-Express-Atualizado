@@ -8,7 +8,7 @@ import { useProfile } from '../../app/context/ProfileContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
-    ArchiveIcon, TruckIcon, MenuIcon
+    ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon
 } from './icons';
 
 const navItems = [
@@ -21,6 +21,7 @@ const navItems = [
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
     { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
     { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
+    { path: '/nota-fiscal', label: 'Nota Fiscal', icon: ClipboardListIcon },
     { path: '/das', label: 'DAS', icon: DollarSignIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },
