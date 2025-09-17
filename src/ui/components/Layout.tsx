@@ -14,17 +14,17 @@ import {
 const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: HomeIcon },
     { path: '/pdv', label: 'PDV', icon: ShoppingCartIcon },
+    { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },
     { path: '/clientes', label: 'Clientes', icon: UsersIcon },
     { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
     { path: '/fornecedores', label: 'Fornecedores', icon: TruckIcon },
     { path: '/produtos', label: 'Produtos', icon: PackageIcon },
     { path: '/estoque', label: 'Estoque', icon: ArchiveIcon },
-    { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
-    { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/nota-fiscal', label: 'Nota Fiscal', icon: ClipboardListIcon },
     { path: '/das', label: 'DAS', icon: DollarSignIcon },
-    { path: '/perfil', label: 'Perfil', icon: UserCircleIcon },
+    { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
+    { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
 ];
 
