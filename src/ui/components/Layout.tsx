@@ -1,6 +1,9 @@
 
 
 
+
+
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
@@ -21,6 +24,8 @@ const navItems = [
     { path: '/fornecedores', label: 'Fornecedores', icon: TruckIcon },
     { path: '/produtos', label: 'Produtos', icon: PackageIcon },
     { path: '/promocoes', label: 'Promoção', icon: TrendingDownIcon },
+    { path: '/pedidos', label: 'Pedidos', icon: ClipboardListIcon },
+    { path: '/entregas', label: 'Entregas', icon: TruckIcon },
     { path: '/estoque', label: 'Estoque', icon: ArchiveIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/nota-fiscal', label: 'Nota Fiscal', icon: ClipboardListIcon },

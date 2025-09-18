@@ -1,6 +1,9 @@
 
 
 
+
+
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
@@ -26,6 +29,8 @@ import SuppliersPage from '../ui/pages/SuppliersPage';
 import DasPage from '../ui/pages/DasPage';
 import NotaFiscalPage from '../ui/pages/NotaFiscalPage';
 import PromotionsPage from '../ui/pages/PromotionsPage';
+import PedidosPage from '../ui/pages/PedidosPage';
+import EntregasPage from '../ui/pages/EntregasPage';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -53,6 +58,8 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/fornecedores" element={<SuppliersPage />} />
                                     <Route path="/produtos" element={<ProductsPage />} />
                                     <Route path="/promocoes" element={<PromotionsPage />} />
+                                    <Route path="/pedidos" element={<PedidosPage />} />
+                                    <Route path="/entregas" element={<EntregasPage />} />
                                     <Route path="/estoque" element={<StockPage />} />
                                     <Route path="/financeiro" element={<FinancialPage />} />
                                     <Route path="/funcionarios" element={<EmployeesPage />} />

@@ -1,6 +1,8 @@
 
 
 
+
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -123,4 +125,44 @@ export interface Promotion {
   endDate: string;
   daysOfWeek?: DayOfWeek[];
   status: 'Ativa' | 'Agendada' | 'Expirada';
+}
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export type OrderStatus = 'Aberto' | 'Pago' | 'Cancelado' | 'Entregue';
+
+export type OrderPaymentMethod = 'Dinheiro' | 'Cartão de Débito' | 'Cartão de Crédito' | 'PIX' | 'Fiado' | 'Misto';
+
+export interface Order {
+  id: string;
+  customerId?: string;
+  customerName?: string;
+  orderDate: string;
+  totalValue: number;
+  status: OrderStatus;
+  paymentMethod: OrderPaymentMethod;
+  items: OrderItem[];
+}
+
+export type DeliveryStatus = 'Pendente' | 'Em trânsito' | 'Entregue' | 'Cancelada';
+export type DeliveryResponsible = 'Entregador Próprio' | 'Motoboy' | 'Transportadora';
+
+export interface Delivery {
+    id: string;
+    orderId: string;
+    deliveryPersonId?: string;
+    deliveryPersonName?: string;
+    deliveryAddress: string;
+    status: DeliveryStatus;
+    estimatedDate: string;
+    deliveryDate?: string;
+    responsible: DeliveryResponsible;
+    deliveryCost: number;
 }

@@ -1,6 +1,10 @@
 
+
+
+
+
 // FIX: Added missing exports to resolve import errors in multiple components.
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -254,5 +258,101 @@ export const mockPromotions: Promotion[] = [
         startDate: '2024-08-01',
         endDate: '2024-08-15',
         status: 'Agendada'
+    }
+];
+
+
+export const mockOrders: Order[] = [
+    {
+        id: 'PED-001',
+        customerId: '1',
+        customerName: 'Cliente Feliz',
+        orderDate: '2024-07-28',
+        totalValue: 124.9,
+        status: 'Entregue',
+        paymentMethod: 'PIX',
+        items: [
+            { id: 'item-1-1', productId: 'prod1', productName: 'Produto A', quantity: 1, unitPrice: 99.9, subtotal: 99.9 },
+            { id: 'item-1-2', productId: 'prod6', productName: 'Caneca Personalizada', quantity: 1, unitPrice: 25.0, subtotal: 25.0 }
+        ]
+    },
+    {
+        id: 'PED-002',
+        customerId: '2',
+        customerName: 'Empresa Parceira LTDA',
+        orderDate: '2024-07-29',
+        totalValue: 170.0,
+        status: 'Pago',
+        paymentMethod: 'Cartão de Crédito',
+        items: [
+            { id: 'item-2-1', productId: 'prod2', productName: 'Produto B', quantity: 20, unitPrice: 8.5, subtotal: 170.0 }
+        ]
+    },
+    {
+        id: 'PED-003',
+        customerName: 'Cliente Avulso',
+        orderDate: '2024-07-30',
+        totalValue: 7.0,
+        status: 'Aberto',
+        paymentMethod: 'Dinheiro',
+        items: [
+            { id: 'item-3-1', productId: 'prod4', productName: 'Produto D', quantity: 2, unitPrice: 3.5, subtotal: 7.0 }
+        ]
+    },
+    {
+        id: 'PED-004',
+        customerId: '3',
+        customerName: 'Sr. Silva',
+        orderDate: '2024-07-30',
+        totalValue: 15,
+        status: 'Cancelado',
+        paymentMethod: 'Fiado',
+        items: [
+            { id: 'item-4-1', productId: 'prod3', productName: 'Produto C', quantity: 1, unitPrice: 15, subtotal: 15.0 }
+        ]
+    }
+];
+
+export const mockDeliveries: Delivery[] = [
+    {
+        id: 'ENT-001',
+        orderId: 'PED-001',
+        deliveryPersonId: 'dp1',
+        deliveryPersonName: 'João da Entrega',
+        deliveryAddress: 'Rua das Alegrias, 123, Centro, São Paulo, SP',
+        status: 'Entregue',
+        estimatedDate: '2024-07-28',
+        deliveryDate: '2024-07-28',
+        responsible: 'Motoboy',
+        deliveryCost: 15.00
+    },
+    {
+        id: 'ENT-002',
+        orderId: 'PED-002',
+        deliveryPersonId: 'dp2',
+        deliveryPersonName: 'Maria Transportes',
+        deliveryAddress: 'Avenida Brasil, 1000, Bonsucesso, Rio de Janeiro, RJ',
+        status: 'Em trânsito',
+        estimatedDate: '2024-07-31',
+        responsible: 'Transportadora',
+        deliveryCost: 50.00
+    },
+    {
+        id: 'ENT-003',
+        orderId: 'PED-003',
+        deliveryAddress: 'A ser retirado na loja',
+        status: 'Pendente',
+        estimatedDate: '2024-08-01',
+        responsible: 'Entregador Próprio',
+        deliveryCost: 0
+    },
+        {
+        id: 'ENT-004',
+        orderId: 'PED-004',
+        deliveryAddress: 'Rua dos Inconfidentes, 500, Savassi, Belo Horizonte, MG',
+        status: 'Cancelada',
+        estimatedDate: '2024-07-30',
+        responsible: 'Motoboy',
+        deliveryCost: 12.00
     }
 ];
