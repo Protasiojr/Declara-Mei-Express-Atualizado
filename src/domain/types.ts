@@ -1,5 +1,6 @@
 
 
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -68,6 +69,14 @@ export interface Employee {
   address: Address;
   vacationStart?: string;
   vacationEnd?: string;
+}
+
+export interface DeliveryPerson {
+  id: string;
+  name: string;
+  phone: string;
+  deliveryCompany: string;
+  address: Address;
 }
 
 export interface Payable {

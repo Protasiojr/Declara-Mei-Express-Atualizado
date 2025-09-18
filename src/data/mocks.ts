@@ -1,6 +1,6 @@
 
-
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion } from '../domain/types';
+// FIX: Added missing exports to resolve import errors in multiple components.
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -73,7 +73,7 @@ export const pdvMockCustomers: Customer[] = [
         phone: '(21) 88888-7777',
         address: { street: 'Avenida Brasil', number: '1000', neighborhood: 'Bonsucesso', city: 'Rio de Janeiro', state: 'RJ', zipCode: '21040-360' }
     },
-    // FIX: Completed the truncated customer object.
+    // FIX: Completed missing customer data.
     {
         id: '3',
         type: CustomerType.INDIVIDUAL,
@@ -84,127 +84,87 @@ export const pdvMockCustomers: Customer[] = [
     }
 ];
 
+export const initialMockEmployees: Employee[] = [
+    {
+        id: 'emp1',
+        name: 'Carlos Alberto',
+        phone: '(11) 98765-4321',
+        pis: '123.45678.90-1',
+        ctps: '1234567 001-SP',
+        address: {
+            street: 'Rua dos Trabalhadores',
+            number: '456',
+            neighborhood: 'Vila Operária',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '02002-000'
+        }
+    },
+    {
+        id: 'emp2',
+        name: 'Fernanda Lima',
+        phone: '(21) 91234-5678',
+        pis: '987.65432.10-9',
+        ctps: '7654321 002-RJ',
+        address: {
+            street: 'Avenida Copacabana',
+            number: '789',
+            neighborhood: 'Copacabana',
+            city: 'Rio de Janeiro',
+            state: 'RJ',
+            zipCode: '22020-001'
+        }
+    }
+];
+
+export const initialMockDeliveryPersons: DeliveryPerson[] = [
+    {
+        id: 'dp1',
+        name: 'João da Entrega',
+        phone: '(11) 91111-2222',
+        deliveryCompany: 'Entrega Rápida Express',
+        address: {
+            street: 'Rua das Entregas',
+            number: '100',
+            neighborhood: 'Logística',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '04004-004'
+        }
+    },
+    {
+        id: 'dp2',
+        name: 'Maria Transportes',
+        phone: '(21) 93333-4444',
+        deliveryCompany: 'Própria',
+        address: {
+            street: 'Avenida dos Pacotes',
+            number: '200',
+            neighborhood: 'Comércio',
+            city: 'Rio de Janeiro',
+            state: 'RJ',
+            zipCode: '22022-022'
+        }
+    }
+];
+
 export const mockProducts: Product[] = [
-    { id: 'p1', name: 'Produto A', barcode: '123456789', sku: 'PA001', category: 'Eletrônicos', description: 'Um produto eletrônico A', costPrice: 50, sellPrice: 99.9, stock: 100, minStock: 10, unit: 'un', type: ProductType.RESALE },
-    { id: 'p2', name: 'Produto B', barcode: '987654321', sku: 'PB002', category: 'Roupas', description: 'Um produto de vestuário B', costPrice: 25, sellPrice: 59.9, stock: 200, minStock: 20, unit: 'pç', type: ProductType.RESALE },
-    { id: 'p3', name: 'Produto Industrializado C', barcode: '112233445', sku: 'PC003', category: 'Alimentos', description: 'Um produto alimentício C', costPrice: 5, sellPrice: 12.5, stock: 50, minStock: 5, unit: 'un', type: ProductType.INDUSTRIALIZED },
-    { id: 'p4', name: 'Produto D', barcode: '556677889', sku: 'PD004', category: 'Eletrônicos', description: 'Um produto eletrônico D', costPrice: 150, sellPrice: 249.9, stock: 30, minStock: 5, unit: 'un', type: ProductType.RESALE },
+    { id: 'prod1', name: 'Produto A', sku: 'SKU-001', category: 'Eletrônicos', costPrice: 50, sellPrice: 99.9, stock: 15, minStock: 5, unit: 'un', type: ProductType.RESALE, barcode: '789000000001' },
+    { id: 'prod2', name: 'Produto B', sku: 'SKU-002', category: 'Limpeza', costPrice: 5, sellPrice: 8.5, stock: 50, minStock: 20, unit: 'un', type: ProductType.RESALE, barcode: '789000000002' },
+    { id: 'prod3', name: 'Produto C', sku: 'SKU-003', category: 'Alimentos', costPrice: 10, sellPrice: 15, stock: 3, minStock: 10, unit: 'kg', type: ProductType.INDUSTRIALIZED, barcode: '789000000003' },
+    { id: 'prod4', name: 'Produto D', sku: 'SKU-004', category: 'Bebidas', costPrice: 2, sellPrice: 3.5, stock: 100, minStock: 30, unit: 'un', type: ProductType.RESALE, barcode: '789000000004' },
+    { id: 'prod5', name: 'Produto E', sku: 'SKU-005', category: 'Papelaria', costPrice: 1, sellPrice: 2.5, stock: 0, minStock: 10, unit: 'un', type: ProductType.RESALE, barcode: '789000000005' },
+    { id: 'prod6', name: 'Caneca Personalizada', sku: 'SKU-006', category: 'Presentes', costPrice: 8, sellPrice: 25.0, stock: 20, minStock: 5, unit: 'un', type: ProductType.INDUSTRIALIZED, barcode: '789000000006' }
 ];
 
 export const mockServices: Service[] = [
-    { id: 's1', name: 'Serviço X', price: 150.00 },
-    { id: 's2', name: 'Serviço Y', price: 200.00 },
-    { id: 's3', name: 'Serviço Z', price: 75.50 },
+    { id: 'serv1', name: 'Serviço X', price: 150 },
+    { id: 'serv2', name: 'Serviço Y', price: 200 },
+    { id: 'serv3', name: 'Consultoria', price: 350 },
 ];
 
-export const initialMockEmployees: Employee[] = [
-    { id: 'e1', name: 'João Funcionário', phone: '(11) 98765-4321', pis: '123.45678.90-1', ctps: '1234567', address: { street: 'Rua do Trabalho', number: '1', neighborhood: 'Vila Operária', city: 'São Paulo', state: 'SP', zipCode: '02002-000' } },
-    { id: 'e2', name: 'Maria Colaboradora', phone: '(21) 91234-5678', pis: '987.65432.10-9', ctps: '7654321', address: { street: 'Avenida Central', number: '2', neighborhood: 'Centro', city: 'Rio de Janeiro', state: 'RJ', zipCode: '20002-000' } },
-];
-
-export const mockPayables: Payable[] = [
-    { id: 'pay1', description: 'Aluguel', category: 'Despesa Fixa', value: 800.00, dueDate: '2024-08-05', paid: false },
-    { id: 'pay2', description: 'Fornecedor A', category: 'Compra de Mercadoria', value: 450.00, dueDate: '2024-08-10', paid: false },
-    { id: 'pay3', description: 'Conta de Luz', category: 'Despesa Fixa', value: 150.00, dueDate: '2024-07-28', paid: true },
-];
-
-export const mockReceivables: Receivable[] = [
-    { id: 'rec1', description: 'Venda para Cliente Feliz', value: 300.00, dueDate: '2024-08-15', received: false },
-    { id: 'rec2', description: 'Serviço para Empresa Parceira', value: 120.00, dueDate: '2024-08-20', received: false },
-    { id: 'rec3', description: 'Venda para Sr. Silva', value: 250.00, dueDate: '2024-07-25', received: true },
-];
-
-export const initialMockSuppliers: Supplier[] = [
-    {
-        id: 'sup1',
-        companyName: 'Fornecedor de Eletrônicos Rápido LTDA',
-        tradingName: 'Eletrônicos Rápido',
-        cnpj: '98.765.432/0001-11',
-        stateRegistration: '111.222.333.444',
-        contactName: 'Sra. Ana',
-        phone: '(11) 5555-4444',
-        address: {
-            street: 'Rua das Peças',
-            number: '1010',
-            neighborhood: 'Santa Ifigênia',
-            city: 'São Paulo',
-            state: 'SP',
-            zipCode: '01207-001'
-        },
-        invoices: []
-    },
-    {
-        id: 'sup2',
-        companyName: 'Distribuidora de Alimentos Sabor do Campo SA',
-        tradingName: 'Sabor do Campo',
-        cnpj: '87.654.321/0001-22',
-        stateRegistration: 'Isento',
-        contactName: 'Sr. Carlos',
-        phone: '(21) 4444-3333',
-        address: {
-            street: 'Avenida das Américas',
-            number: '500',
-            neighborhood: 'Barra da Tijuca',
-            city: 'Rio de Janeiro',
-            state: 'RJ',
-            zipCode: '22640-100'
-        },
-        invoices: ['NF-12345.pdf']
-    }
-];
-
-export const mockPromotions: Promotion[] = [
-    {
-        id: 'promo1',
-        name: 'Promoção de Inverno',
-        description: 'Descontos especiais para aquecer seu inverno.',
-        productId: 'p2',
-        productName: 'Produto B',
-        originalPrice: 59.9,
-        discountPercentage: 15,
-        promotionalPrice: 50.92,
-        startDate: '2024-07-01',
-        endDate: '2024-07-31',
-        status: 'Ativa'
-    },
-    {
-        id: 'promo2',
-        name: 'Queima de Estoque Eletrônicos',
-        description: 'Últimas unidades do Produto A com preço imbatível.',
-        productId: 'p1',
-        productName: 'Produto A',
-        originalPrice: 99.9,
-        discountPercentage: 20,
-        promotionalPrice: 79.92,
-        startDate: '2024-06-15',
-        endDate: '2024-06-30',
-        status: 'Expirada'
-    },
-    {
-        id: 'promo3',
-        name: 'Dia dos Pais',
-        description: 'Promoção referente ao dia dos pais',
-        productId: 'p4',
-        productName: 'Produto D',
-        originalPrice: 249.9,
-        discountPercentage: 10,
-        promotionalPrice: 224.91,
-        startDate: '2024-08-01',
-        endDate: '2024-08-11',
-        status: 'Agendada'
-    }
-];
-
-
-interface SearchableProduct {
-    id: string; name: string; barcode?: string; sku: string; category: string; price: number; stock: number; type: 'product';
-}
-interface SearchableService {
-    id: string; name: string; price: number; type: 'service';
-}
-type SearchableItem = SearchableProduct | SearchableService;
-
-export const searchablePdvItems: SearchableItem[] = [
+// This type is defined locally in PdvPage.tsx, so we cast the items to match.
+export const searchablePdvItems = [
     ...mockProducts.map(p => ({
         id: p.id,
         name: p.name,
@@ -213,12 +173,86 @@ export const searchablePdvItems: SearchableItem[] = [
         category: p.category,
         price: p.sellPrice,
         stock: p.stock,
-        type: 'product' as const,
+        type: 'product' as const
     })),
     ...mockServices.map(s => ({
         id: s.id,
         name: s.name,
         price: s.price,
-        type: 'service' as const,
-    })),
+        type: 'service' as const
+    }))
+];
+
+export const mockPayables: Payable[] = [
+    { id: 'pay1', description: 'Aluguel', category: 'Despesa Fixa', value: 800, dueDate: '10/08/2024', paid: false },
+    { id: 'pay2', description: 'Fornecedor Tech', category: 'Compra', value: 350, dueDate: '01/08/2024', paid: false },
+    { id: 'pay3', description: 'Conta de Luz', category: 'Despesa Variável', value: 100, dueDate: '25/07/2024', paid: true },
+];
+
+export const mockReceivables: Receivable[] = [
+    { id: 'rec1', description: 'Venda #123', value: 250, dueDate: '15/08/2024', received: false },
+    { id: 'rec2', description: 'Serviço de Consultoria', value: 170, dueDate: '28/07/2024', received: true },
+];
+
+export const initialMockSuppliers: Supplier[] = [
+    {
+        id: 'sup1',
+        companyName: 'Fornecedor Tech LTDA',
+        cnpj: '98.765.432/0001-11',
+        contactName: 'Sra. Roberta',
+        phone: '(11) 5555-4444',
+        address: {
+            street: 'Rua das Indústrias',
+            number: '789',
+            neighborhood: 'Distrito Industrial',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '03003-000'
+        }
+    },
+    {
+        id: 'sup2',
+        companyName: 'Distribuidora de Alimentos S.A.',
+        tradingName: 'Distribuidora Sabor',
+        cnpj: '11.222.333/0001-44',
+        contactName: 'Sr. Mário',
+        phone: '(31) 4444-3333',
+        address: {
+            street: 'Avenida dos Sabores',
+            number: '101',
+            neighborhood: 'Centro',
+            city: 'Belo Horizonte',
+            state: 'MG',
+            zipCode: '30110-001'
+        }
+    }
+];
+
+export const mockPromotions: Promotion[] = [
+    {
+        id: 'promo1',
+        name: 'Queima de Estoque Produto C',
+        description: 'Desconto para zerar o estoque!',
+        productId: 'prod3',
+        productName: 'Produto C',
+        originalPrice: 15,
+        discountPercentage: 20,
+        promotionalPrice: 12,
+        startDate: '2024-07-01',
+        endDate: '2024-07-31',
+        status: 'Ativa'
+    },
+    {
+        id: 'promo2',
+        name: 'Promoção de Inverno',
+        description: 'Desconto especial para canecas',
+        productId: 'prod6',
+        productName: 'Caneca Personalizada',
+        originalPrice: 25,
+        discountPercentage: 10,
+        promotionalPrice: 22.5,
+        startDate: '2024-08-01',
+        endDate: '2024-08-15',
+        status: 'Agendada'
+    }
 ];
