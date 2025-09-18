@@ -1,4 +1,5 @@
 
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -96,4 +97,21 @@ export interface Supplier {
   phone: string;
   address: Address;
   invoices?: string[];
+}
+
+export type DayOfWeek = 'Dom' | 'Seg' | 'Ter' | 'Qua' | 'Qui' | 'Sex' | 'Sab';
+
+export interface Promotion {
+  id: string;
+  name: string;
+  description: string;
+  productId: string;
+  productName: string;
+  originalPrice: number;
+  discountPercentage: number;
+  promotionalPrice: number;
+  startDate: string;
+  endDate: string;
+  daysOfWeek?: DayOfWeek[];
+  status: 'Ativa' | 'Agendada' | 'Expirada';
 }

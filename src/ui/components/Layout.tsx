@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
@@ -8,7 +9,7 @@ import { useProfile } from '../../app/context/ProfileContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
-    ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon
+    ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon, TrendingDownIcon
 } from './icons';
 
 const navItems = [
@@ -19,6 +20,7 @@ const navItems = [
     { path: '/funcionarios', label: 'Funcionário', icon: UsersIcon },
     { path: '/fornecedores', label: 'Fornecedores', icon: TruckIcon },
     { path: '/produtos', label: 'Produtos', icon: PackageIcon },
+    { path: '/promocoes', label: 'Promoção', icon: TrendingDownIcon },
     { path: '/estoque', label: 'Estoque', icon: ArchiveIcon },
     { path: '/empresa', label: 'Empresa', icon: BuildingIcon },
     { path: '/nota-fiscal', label: 'Nota Fiscal', icon: ClipboardListIcon },

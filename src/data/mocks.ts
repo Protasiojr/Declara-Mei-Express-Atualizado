@@ -1,5 +1,6 @@
 
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier } from '../domain/types';
+
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -151,6 +152,49 @@ export const initialMockSuppliers: Supplier[] = [
         invoices: ['NF-12345.pdf']
     }
 ];
+
+export const mockPromotions: Promotion[] = [
+    {
+        id: 'promo1',
+        name: 'Promoção de Inverno',
+        description: 'Descontos especiais para aquecer seu inverno.',
+        productId: 'p2',
+        productName: 'Produto B',
+        originalPrice: 59.9,
+        discountPercentage: 15,
+        promotionalPrice: 50.92,
+        startDate: '2024-07-01',
+        endDate: '2024-07-31',
+        status: 'Ativa'
+    },
+    {
+        id: 'promo2',
+        name: 'Queima de Estoque Eletrônicos',
+        description: 'Últimas unidades do Produto A com preço imbatível.',
+        productId: 'p1',
+        productName: 'Produto A',
+        originalPrice: 99.9,
+        discountPercentage: 20,
+        promotionalPrice: 79.92,
+        startDate: '2024-06-15',
+        endDate: '2024-06-30',
+        status: 'Expirada'
+    },
+    {
+        id: 'promo3',
+        name: 'Dia dos Pais',
+        description: 'Promoção referente ao dia dos pais',
+        productId: 'p4',
+        productName: 'Produto D',
+        originalPrice: 249.9,
+        discountPercentage: 10,
+        promotionalPrice: 224.91,
+        startDate: '2024-08-01',
+        endDate: '2024-08-11',
+        status: 'Agendada'
+    }
+];
+
 
 interface SearchableProduct {
     id: string; name: string; barcode?: string; sku: string; category: string; price: number; stock: number; type: 'product';
