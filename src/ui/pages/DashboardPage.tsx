@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon, UserCircleIcon, ClockIcon, ClipboardListIcon, TruckIcon } from '../components/icons';
 import { useSettings } from '../../app/context/SettingsContext';
-import { mockOrders, mockDeliveries, mockProducts } from '../../data/mocks';
+import { mockOrders, mockDeliveries, mockProducts, mockPromotions } from '../../data/mocks';
 
 const StatCard: React.FC<{ title: string; value: React.ReactNode; icon: React.ReactNode; status?: React.ReactNode; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
@@ -161,6 +161,10 @@ const DashboardPage: React.FC = () => {
 
     const lowStockCount = lowStockProducts.length + outOfStockProducts.length;
 
+    const activePromotionsCount = useMemo(() => 
+        mockPromotions.filter(p => p.status === 'Ativa').length,
+    []);
+
     const topLowStockProducts = useMemo(() => 
         [...outOfStockProducts, ...lowStockProducts].slice(0, 10),
     [outOfStockProducts, lowStockProducts]);
@@ -311,6 +315,21 @@ const DashboardPage: React.FC = () => {
                     value="R$ 4.500,00" 
                     status="+15% vs Mês Anterior" 
                     icon={<TrendingUpIcon className="w-6 h-6 text-green-400" />}
+                />
+                <StatCard
+                    title="Promoções Ativas"
+                    value={activePromotionsCount}
+                    icon={<TrendingDownIcon className={`w-6 h-6 ${activePromotionsCount > 0 ? 'text-pink-400' : 'text-gray-400'}`} />}
+                    status={
+                        activePromotionsCount > 0 ? (
+                            <Link to="/promocoes" className="font-semibold text-pink-400 hover:underline">
+                                Ver promoções
+                            </Link>
+                        ) : (
+                            'Nenhuma promoção ativa'
+                        )
+                    }
+                    statusColor={activePromotionsCount > 0 ? 'text-pink-400' : 'text-gray-400'}
                 />
             </div>
 
