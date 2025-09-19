@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { ArchiveIcon, TrendingDownIcon, TrendingUpIcon, ArrowRightLeftIcon, FactoryIcon, WrenchIcon, UserCircleIcon, ClockIcon, ClipboardListIcon, TruckIcon } from '../components/icons';
 import { useSettings } from '../../app/context/SettingsContext';
 import { mockOrders, mockDeliveries, mockProducts, mockPromotions } from '../../data/mocks';
+import { DeliveryStatus } from '../../domain/types';
 
 const StatCard: React.FC<{ title: string; value: React.ReactNode; icon: React.ReactNode; status?: React.ReactNode; statusColor?: string }> = ({ title, value, icon, status, statusColor = 'text-green-400' }) => (
     <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
@@ -187,6 +188,19 @@ const DashboardPage: React.FC = () => {
             .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
             .slice(0, 10),
     []);
+
+    const lastTenDeliveries = useMemo(() =>
+        [...mockDeliveries]
+            .sort((a, b) => new Date(b.estimatedDate).getTime() - new Date(a.estimatedDate).getTime())
+            .slice(0, 10),
+    []);
+
+    const deliveryStatusStyles: { [key in DeliveryStatus]: string } = {
+        'Pendente': 'bg-yellow-500/20 text-yellow-300',
+        'Em trânsito': 'bg-blue-500/20 text-blue-300',
+        'Entregue': 'bg-green-500/20 text-green-300',
+        'Cancelada': 'bg-red-500/20 text-red-300',
+    };
 
     const [loginTime] = useState(new Date());
     const [cashierState, setCashierState] = useState({ isOpen: false, openTime: '' });
@@ -464,6 +478,24 @@ const DashboardPage: React.FC = () => {
                                 </li>
                             )) : (
                                 <li className="text-center text-gray-500">Nenhum produto com estoque baixo.</li>
+                            )}
+                        </ul>
+                    </div>
+                    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+                        <h3 className="text-lg font-semibold text-white mb-4">Últimas 10 Entregas</h3>
+                        <ul className="space-y-3">
+                            {lastTenDeliveries.length > 0 ? lastTenDeliveries.map((d) => (
+                                <li key={d.id} className="flex justify-between items-center text-sm">
+                                    <div className="flex flex-col">
+                                        <span className="text-gray-300 font-semibold">{d.orderId}</span>
+                                        <span className="text-gray-400 text-xs">{d.deliveryPersonName || 'A atribuir'}</span>
+                                    </div>
+                                    <span className={`font-semibold text-xs px-2 py-1 rounded-full ${deliveryStatusStyles[d.status]}`}>
+                                        {d.status}
+                                    </span>
+                                </li>
+                            )) : (
+                                <li className="text-center text-gray-500">Nenhuma entrega recente.</li>
                             )}
                         </ul>
                     </div>
