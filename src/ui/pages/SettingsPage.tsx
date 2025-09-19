@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../app/context/SettingsContext';
 
 const SettingsCard: React.FC<{ title: string; description: string; children: React.ReactNode }> = ({ title, description, children }) => (
@@ -15,6 +15,26 @@ const SettingsCard: React.FC<{ title: string; description: string; children: Rea
 
 const SettingsPage: React.FC = () => {
     const { meiLimit, setMeiLimit, employeeLimit, setEmployeeLimit } = useSettings();
+    const [localEmployeeLimit, setLocalEmployeeLimit] = useState(String(employeeLimit));
+
+    useEffect(() => {
+        setLocalEmployeeLimit(String(employeeLimit));
+    }, [employeeLimit]);
+
+    const handleEmployeeLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalEmployeeLimit(e.target.value);
+    };
+
+    const handleEmployeeLimitBlur = () => {
+        const num = parseInt(localEmployeeLimit, 10);
+        if (!isNaN(num) && num >= 1) {
+            setEmployeeLimit(num);
+        } else {
+            // Revert to the last valid value from context if input is invalid
+            setLocalEmployeeLimit(String(employeeLimit));
+        }
+    };
+
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
@@ -52,9 +72,11 @@ const SettingsPage: React.FC = () => {
                             <input
                                 type="number"
                                 id="employee-limit"
+                                min="1"
                                 className="mt-1 block w-full bg-green-950 border-green-700 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500"
-                                value={employeeLimit}
-                                onChange={(e) => setEmployeeLimit(Number(e.target.value))}
+                                value={localEmployeeLimit}
+                                onChange={handleEmployeeLimitChange}
+                                onBlur={handleEmployeeLimitBlur}
                             />
                             <p className="mt-2 text-xs text-gray-500">
                                 Altere a quantidade de funcionários de acordo com as regras atuais do MEI. Para 2025, o limite é de 1 funcionário.
