@@ -100,6 +100,19 @@ const annualData = [
     { name: 'Nov', faturamento: 7500 }, { name: 'Dez', faturamento: 9000 },
 ];
 
+const dailyData = [
+    { name: 'Manhã', faturamento: 345.50 },
+    { name: 'Tarde', faturamento: 580.20 },
+    { name: 'Noite', faturamento: 210.00 },
+];
+
+const monthlyData = [
+    { name: 'Semana 1', faturamento: 1850.00 },
+    { name: 'Semana 2', faturamento: 2100.50 },
+    { name: 'Semana 3', faturamento: 1750.80 },
+    { name: 'Semana 4', faturamento: 2148.70 },
+];
+
 const topProducts = [
     { name: 'Produto A', sales: 150 }, { name: 'Produto B', sales: 120 },
     { name: 'Serviço X', sales: 110 }, { name: 'Produto C', sales: 95 },
@@ -341,20 +354,58 @@ const DashboardPage: React.FC = () => {
 
             {/* Main Chart and Lists */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Annual Revenue Chart */}
-                <div className="lg:col-span-2 bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
-                    <h3 className="text-lg font-semibold text-white mb-4">Resumo do Faturamento Anual</h3>
-                    <div style={{ width: '100%', height: 300 }}>
-                        <ResponsiveContainer>
-                            <BarChart data={annualData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#166534" />
-                                <XAxis dataKey="name" stroke="#6EE7B7" />
-                                <YAxis stroke="#6EE7B7" />
-                                <Tooltip contentStyle={{ backgroundColor: '#064E3B', border: '1px solid #166534' }} />
-                                <Legend />
-                                <Bar dataKey="faturamento" fill="#4ADE80" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                
+                {/* Charts Column */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Daily Chart */}
+                    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+                        <h3 className="text-lg font-semibold text-white mb-4">Resumo de Faturamento Diário</h3>
+                        <div style={{ width: '100%', height: 300 }}>
+                            <ResponsiveContainer>
+                                <BarChart data={dailyData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#166534" />
+                                    <XAxis dataKey="name" stroke="#6EE7B7" />
+                                    <YAxis stroke="#6EE7B7" />
+                                    <Tooltip contentStyle={{ backgroundColor: '#064E3B', border: '1px solid #166534' }} />
+                                    <Legend />
+                                    <Bar dataKey="faturamento" fill="#4ADE80" name="Faturamento (R$)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Monthly Chart */}
+                    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+                        <h3 className="text-lg font-semibold text-white mb-4">Resumo de Faturamento Mensal</h3>
+                        <div style={{ width: '100%', height: 300 }}>
+                            <ResponsiveContainer>
+                                <BarChart data={monthlyData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#166534" />
+                                    <XAxis dataKey="name" stroke="#6EE7B7" />
+                                    <YAxis stroke="#6EE7B7" />
+                                    <Tooltip contentStyle={{ backgroundColor: '#064E3B', border: '1px solid #166534' }} />
+                                    <Legend />
+                                    <Bar dataKey="faturamento" fill="#4ADE80" name="Faturamento (R$)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                    
+                    {/* Annual Revenue Chart */}
+                    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+                        <h3 className="text-lg font-semibold text-white mb-4">Resumo do Faturamento Anual</h3>
+                        <div style={{ width: '100%', height: 300 }}>
+                            <ResponsiveContainer>
+                                <BarChart data={annualData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#166534" />
+                                    <XAxis dataKey="name" stroke="#6EE7B7" />
+                                    <YAxis stroke="#6EE7B7" />
+                                    <Tooltip contentStyle={{ backgroundColor: '#064E3B', border: '1px solid #166534' }} />
+                                    <Legend />
+                                    <Bar dataKey="faturamento" fill="#4ADE80" name="Faturamento (R$)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                 </div>
 
