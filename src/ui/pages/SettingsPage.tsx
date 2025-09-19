@@ -14,7 +14,7 @@ const SettingsCard: React.FC<{ title: string; description: string; children: Rea
 );
 
 const SettingsPage: React.FC = () => {
-    const { meiLimit, setMeiLimit } = useSettings();
+    const { meiLimit, setMeiLimit, employeeLimit, setEmployeeLimit } = useSettings();
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
@@ -23,9 +23,9 @@ const SettingsPage: React.FC = () => {
             <div className="space-y-8">
                 <SettingsCard
                     title="Configurações Gerais"
-                    description="Ajustes principais do sistema."
+                    description="Ajustes principais do sistema e regras de negócio do MEI."
                 >
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         <div>
                             <label htmlFor="mei-limit" className="block text-sm font-medium text-gray-300">
                                 Limite de Faturamento MEI Anual
@@ -43,6 +43,22 @@ const SettingsPage: React.FC = () => {
                                 />
                             </div>
                              <p className="mt-2 text-xs text-gray-500">Este valor é usado no Dashboard para calcular o progresso do faturamento.</p>
+                        </div>
+
+                        <div>
+                            <label htmlFor="employee-limit" className="block text-sm font-medium text-gray-300">
+                                Limite de Funcionários Permitidos
+                            </label>
+                            <input
+                                type="number"
+                                id="employee-limit"
+                                className="mt-1 block w-full bg-green-950 border-green-700 rounded-md shadow-sm text-white focus:ring-green-500 focus:border-green-500"
+                                value={employeeLimit}
+                                onChange={(e) => setEmployeeLimit(Number(e.target.value))}
+                            />
+                            <p className="mt-2 text-xs text-gray-500">
+                                Altere a quantidade de funcionários de acordo com as regras atuais do MEI. Para 2025, o limite é de 1 funcionário.
+                            </p>
                         </div>
                     </div>
                 </SettingsCard>

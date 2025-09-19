@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface SettingsContextType {
   meiLimit: number;
   setMeiLimit: (limit: number) => void;
+  employeeLimit: number;
+  setEmployeeLimit: (limit: number) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -17,15 +19,20 @@ export const useSettings = () => {
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [meiLimit, setMeiLimitState] = useState<number>(81000);
+  const [employeeLimit, setEmployeeLimitState] = useState<number>(1);
 
   useEffect(() => {
     try {
-      const storedLimit = localStorage.getItem('meiLimit');
-      if (storedLimit) {
-        setMeiLimitState(parseFloat(storedLimit));
+      const storedMeiLimit = localStorage.getItem('meiLimit');
+      if (storedMeiLimit) {
+        setMeiLimitState(parseFloat(storedMeiLimit));
+      }
+      const storedEmployeeLimit = localStorage.getItem('employeeLimit');
+      if (storedEmployeeLimit) {
+        setEmployeeLimitState(parseInt(storedEmployeeLimit, 10));
       }
     } catch (error) {
-        console.error("Failed to parse meiLimit from localStorage", error);
+        console.error("Failed to parse settings from localStorage", error);
     }
   }, []);
 
@@ -38,8 +45,17 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const setEmployeeLimit = (newLimit: number) => {
+    setEmployeeLimitState(newLimit);
+    try {
+        localStorage.setItem('employeeLimit', newLimit.toString());
+    } catch (error) {
+        console.error("Failed to set employeeLimit in localStorage", error);
+    }
+  };
+
   return (
-    <SettingsContext.Provider value={{ meiLimit, setMeiLimit }}>
+    <SettingsContext.Provider value={{ meiLimit, setMeiLimit, employeeLimit, setEmployeeLimit }}>
       {children}
     </SettingsContext.Provider>
   );
