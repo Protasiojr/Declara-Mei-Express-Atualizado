@@ -211,6 +211,8 @@ const DashboardPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+
             <div className="bg-green-900 p-4 rounded-lg shadow-md border border-green-800 flex flex-col sm:flex-row sm:flex-wrap items-center justify-between gap-4 sm:gap-6">
                 <div className="flex items-center gap-3">
                     <UserCircleIcon className="w-8 h-8 text-green-400 flex-shrink-0" />
@@ -239,8 +241,6 @@ const DashboardPage: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
 
             <MeiLimitProgress currentRevenue={annualRevenue} limit={meiLimit} />
 
