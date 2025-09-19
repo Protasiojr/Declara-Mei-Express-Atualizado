@@ -169,6 +169,12 @@ const DashboardPage: React.FC = () => {
         [...outOfStockProducts, ...lowStockProducts].slice(0, 10),
     [outOfStockProducts, lowStockProducts]);
     
+    const lastTenPromotions = useMemo(() => 
+        [...mockPromotions]
+            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
+            .slice(0, 10),
+    []);
+
     const [loginTime] = useState(new Date());
     const [cashierState, setCashierState] = useState({ isOpen: false, openTime: '' });
     const [sessionDuration, setSessionDuration] = useState('00:00:00');
@@ -354,6 +360,25 @@ const DashboardPage: React.FC = () => {
 
                 {/* Side Lists */}
                 <div className="space-y-6">
+                    <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
+                        <h3 className="text-lg font-semibold text-white mb-4">Últimas 10 Promoções</h3>
+                        <ul className="space-y-3">
+                            {lastTenPromotions.length > 0 ? lastTenPromotions.map((p, i) => (
+                                <li key={i} className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-300 truncate pr-2">{p.name}</span>
+                                    <span className={`font-semibold text-xs px-2 py-1 rounded-full ${
+                                        p.status === 'Ativa' ? 'bg-green-500/20 text-green-300' : 
+                                        p.status === 'Agendada' ? 'bg-blue-500/20 text-blue-300' :
+                                        'bg-gray-500/20 text-gray-400'
+                                    }`}>
+                                        {p.status}
+                                    </span>
+                                </li>
+                            )) : (
+                                <li className="text-center text-gray-500">Nenhuma promoção cadastrada.</li>
+                            )}
+                        </ul>
+                    </div>
                      <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                         <h3 className="text-lg font-semibold text-white mb-4">Top 10 Produtos Mais Vendidos</h3>
                         <ul className="space-y-3">
