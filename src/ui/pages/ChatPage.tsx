@@ -1,8 +1,9 @@
 
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ChatContact, ContactType, ChatConversation, ChatMessage } from '../../domain/types';
 import { mockChatContacts, mockConversations } from '../../data/mocks';
-import { SearchIcon, PlusIcon, MessageSquareIcon, SendIcon, MoreVerticalIcon, Trash2Icon } from '../components/icons';
+import { SearchIcon, PlusIcon, MessageSquareIcon, SendIcon, MoreVerticalIcon, Trash2Icon, PaperclipIcon, TelegramIcon, UsersIcon, TruckIcon, BuildingIcon, HeadphonesIcon, UserPlusIcon } from '../components/icons';
 
 type ActiveTab = 'Telegram' | 'Clientes' | 'Entregadores' | 'Fornecedores' | 'Suporte' | 'Adicionar Contato';
 
@@ -16,6 +17,16 @@ const ChatPage: React.FC = () => {
     const [contactForModal, setContactForModal] = useState<ChatContact | null>(null);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const attachmentInputRef = useRef<HTMLInputElement>(null);
+
+    const tabs: { name: ActiveTab; icon: React.FC<{className?: string}>; label: string }[] = [
+        { name: 'Telegram', icon: TelegramIcon, label: 'Config. Telegram' },
+        { name: 'Clientes', icon: UsersIcon, label: 'Clientes' },
+        { name: 'Entregadores', icon: TruckIcon, label: 'Entregadores' },
+        { name: 'Fornecedores', icon: BuildingIcon, label: 'Fornecedores' },
+        { name: 'Suporte', icon: HeadphonesIcon, label: 'Suporte' },
+        { name: 'Adicionar Contato', icon: UserPlusIcon, label: 'Adicionar Contato' },
+    ];
 
     const filteredContacts = useMemo(() => {
         const byTab = contacts.filter(c => {
@@ -67,6 +78,17 @@ const ChatPage: React.FC = () => {
 
         setNewMessage('');
     };
+    
+    const handleAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            console.log('Arquivo selecionado:', file.name, file.type);
+            alert(`Anexo "${file.name}" selecionado. Funcionalidade de envio não implementada.`);
+        }
+        if (e.target) {
+            e.target.value = '';
+        }
+    };
 
     const handleSaveContact = (contact: ChatContact) => {
         if (modal === 'edit' && contactForModal) {
@@ -100,10 +122,10 @@ const ChatPage: React.FC = () => {
                 </div>
 
                 <div className="flex justify-around p-2 bg-green-900 border-b border-green-800 text-sm">
-                    {(['Telegram', 'Clientes', 'Entregadores', 'Fornecedores', 'Suporte', 'Adicionar Contato'] as ActiveTab[]).map(tab => (
-                        <button key={tab} onClick={() => setActiveTab(tab)}
-                                className={`px-2 py-1 rounded-md ${activeTab === tab ? 'bg-green-600 text-white' : 'hover:bg-green-800'}`}>
-                            {tab}
+                    {tabs.map(tab => (
+                        <button key={tab.name} onClick={() => setActiveTab(tab.name)} title={tab.label}
+                                className={`p-2 rounded-md ${activeTab === tab.name ? 'bg-green-600 text-white' : 'text-gray-400 hover:bg-green-800 hover:text-white'}`}>
+                            <tab.icon className="w-5 h-5" />
                         </button>
                     ))}
                 </div>
@@ -139,7 +161,11 @@ const ChatPage: React.FC = () => {
                         </div>
                         
                         <div className="p-4 bg-green-900">
-                            <form onSubmit={handleSendMessage} className="flex items-center gap-4">
+                            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                                <button type="button" onClick={() => attachmentInputRef.current?.click()} className="p-3 text-gray-400 hover:text-white rounded-full hover:bg-green-800">
+                                    <PaperclipIcon className="w-5 h-5"/>
+                                </button>
+                                <input type="file" ref={attachmentInputRef} onChange={handleAttachment} className="hidden" accept="video/*,audio/*,image/*" />
                                 <input type="text" placeholder="Digite uma mensagem..." value={newMessage} onChange={e => setNewMessage(e.target.value)}
                                        className="flex-1 bg-green-800 border-green-700 rounded-full py-2 px-4 text-white focus:outline-none focus:ring-1 focus:ring-green-500"/>
                                 <button type="submit" className="bg-green-600 rounded-full p-3 text-white hover:bg-green-500">
