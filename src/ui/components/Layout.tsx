@@ -12,7 +12,8 @@ import { useProfile } from '../../app/context/ProfileContext';
 import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
-    ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon, TrendingDownIcon
+    ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon, TrendingDownIcon,
+    ShieldIcon
 } from './icons';
 
 const navItems = [
@@ -32,6 +33,7 @@ const navItems = [
     { path: '/das', label: 'DAS', icon: DollarSignIcon },
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
     { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
+    { path: '/auditoria', label: 'Auditoria/Logs', icon: ShieldIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
 ];
 

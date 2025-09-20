@@ -3,6 +3,7 @@
 
 
 
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -165,4 +166,25 @@ export interface Delivery {
     deliveryDate?: string;
     responsible: DeliveryResponsible;
     deliveryCost: number;
+}
+
+export interface AuditUser {
+    id: string;
+    name: string;
+    lastLogin: string;
+}
+
+export interface UserAction {
+    id: string;
+    userId: string;
+    timestamp: string;
+    action: string;
+    details: string;
+}
+
+export interface SystemLog {
+    id: string;
+    timestamp: string;
+    level: 'INFO' | 'AVISO' | 'ERRO';
+    message: string;
 }

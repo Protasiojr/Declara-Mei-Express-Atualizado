@@ -3,8 +3,9 @@
 
 
 
+
 // FIX: Added missing exports to resolve import errors in multiple components.
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -355,4 +356,33 @@ export const mockDeliveries: Delivery[] = [
         responsible: 'Motoboy',
         deliveryCost: 12.00
     }
+];
+
+export const mockAuditUsers: AuditUser[] = [
+    { id: 'user1', name: 'Administrador', lastLogin: '30/07/2024 10:00:00' },
+    { id: 'emp1', name: 'Carlos Alberto', lastLogin: '29/07/2024 15:30:00' },
+    { id: 'emp2', name: 'Fernanda Lima', lastLogin: '30/07/2024 09:15:23' },
+];
+
+export const mockUserActions: UserAction[] = [
+    // Admin actions
+    { id: 'act1', userId: 'user1', timestamp: '30/07/2024 10:00:00', action: 'Login', details: 'Login bem-sucedido do IP 192.168.1.1' },
+    { id: 'act2', userId: 'user1', timestamp: '30/07/2024 10:05:12', action: 'Criação de Produto', details: 'Produto "Caneca Personalizada" (SKU-006) criado.' },
+    { id: 'act3', userId: 'user1', timestamp: '30/07/2024 10:15:45', action: 'Abertura de Caixa', details: 'Caixa aberto com saldo inicial de R$ 100,00.' },
+    { id: 'act4', userId: 'user1', timestamp: '30/07/2024 10:20:03', action: 'Venda Realizada', details: 'Venda #PED-003 registrada no valor de R$ 7,00.' },
+    // Carlos actions
+    { id: 'act5', userId: 'emp1', timestamp: '29/07/2024 15:30:00', action: 'Login', details: 'Login bem-sucedido do IP 192.168.1.5' },
+    { id: 'act6', userId: 'emp1', timestamp: '29/07/2024 15:32:10', action: 'Cadastro de Cliente', details: 'Cliente "Sr. Silva" cadastrado.' },
+    // Fernanda actions
+    { id: 'act7', userId: 'emp2', timestamp: '30/07/2024 09:15:23', action: 'Login', details: 'Login bem-sucedido do IP 192.168.1.8' },
+    { id: 'act8', userId: 'emp2', timestamp: '30/07/2024 09:18:00', action: 'Ajuste de Estoque', details: 'Produto "Produto C" (SKU-003) ajustado para 3 unidades. Motivo: Contagem de inventário.' },
+];
+
+export const mockSystemLogs: SystemLog[] = [
+    { id: 'log1', timestamp: '30/07/2024 10:00:00', level: 'INFO', message: 'Servidor iniciado com sucesso.' },
+    { id: 'log2', timestamp: '30/07/2024 10:05:12', level: 'INFO', message: 'Operação de escrita no banco de dados (produtos) concluída.' },
+    { id: 'log3', timestamp: '30/07/2024 10:18:30', level: 'AVISO', message: 'A resposta da API de CEP demorou mais que o esperado (1500ms).' },
+    { id: 'log4', timestamp: '30/07/2024 10:25:00', level: 'ERRO', message: 'Falha ao conectar ao serviço de emissão de NF-e. Endpoint indisponível.' },
+    { id: 'log5', timestamp: '30/07/2024 10:30:00', level: 'INFO', message: 'Backup diário automático iniciado.' },
+    { id: 'log6', timestamp: '30/07/2024 10:35:15', level: 'ERRO', message: 'Tentativa de login falhou para o usuário "visitante" a partir do IP 203.0.113.10.' },
 ];
