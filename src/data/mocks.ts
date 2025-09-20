@@ -5,7 +5,7 @@
 
 
 // FIX: Added missing exports to resolve import errors in multiple components.
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog, ChatContact, ChatConversation } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -385,4 +385,89 @@ export const mockSystemLogs: SystemLog[] = [
     { id: 'log4', timestamp: '30/07/2024 10:25:00', level: 'ERRO', message: 'Falha ao conectar ao serviço de emissão de NF-e. Endpoint indisponível.' },
     { id: 'log5', timestamp: '30/07/2024 10:30:00', level: 'INFO', message: 'Backup diário automático iniciado.' },
     { id: 'log6', timestamp: '30/07/2024 10:35:15', level: 'ERRO', message: 'Tentativa de login falhou para o usuário "visitante" a partir do IP 203.0.113.10.' },
+];
+
+export const mockChatContacts: ChatContact[] = [
+    {
+        id: 'cli1',
+        name: 'Cliente Feliz',
+        phone: '+5511999998888',
+        type: 'Cliente',
+        lastMessage: 'Ok, obrigado!',
+        lastMessageTimestamp: '10:45',
+        unreadCount: 0,
+    },
+    {
+        id: 'cli2',
+        name: 'Empresa Parceira',
+        phone: '+5521888887777',
+        type: 'Cliente',
+        lastMessage: 'Pode me enviar o orçamento atualizado?',
+        lastMessageTimestamp: 'Ontem',
+        unreadCount: 2,
+    },
+    {
+        id: 'ent1',
+        name: 'João da Entrega',
+        phone: '+5511911112222',
+        type: 'Entregador',
+        lastMessage: 'A caminho para a próxima entrega.',
+        lastMessageTimestamp: '11:30',
+        unreadCount: 0,
+    },
+    {
+        id: 'for1',
+        name: 'Fornecedor Tech',
+        phone: '+551155554444',
+        type: 'Fornecedor',
+        lastMessage: 'Seu pedido foi despachado.',
+        lastMessageTimestamp: 'Sexta-feira',
+        unreadCount: 0,
+    },
+    {
+        id: 'sup1',
+        name: 'Suporte DME',
+        phone: '+5511987654321',
+        type: 'Suporte',
+        lastMessage: 'Sua solicitação #123 foi resolvida.',
+        lastMessageTimestamp: '14:20',
+        unreadCount: 0,
+    },
+];
+
+export const mockConversations: ChatConversation[] = [
+    {
+        contactId: 'cli1',
+        messages: [
+            { id: 'msg1', text: 'Bom dia! Gostaria de saber sobre o status do meu pedido PED-001.', sender: 'contact', timestamp: '10:40', status: 'read' },
+            { id: 'msg2', text: 'Olá! Seu pedido já foi entregue.', sender: 'me', timestamp: '10:42', status: 'read' },
+            { id: 'msg3', text: 'Ok, obrigado!', sender: 'contact', timestamp: '10:45', status: 'read' },
+        ]
+    },
+    {
+        contactId: 'cli2',
+        messages: [
+            { id: 'msg4', text: 'Boa tarde, a fatura deste mês já foi emitida?', sender: 'me', timestamp: 'Ontem', status: 'read' },
+            { id: 'msg5', text: 'Olá, boa tarde! Sim, já enviei para o seu email.', sender: 'contact', timestamp: 'Ontem', status: 'delivered' },
+            { id: 'msg6', text: 'Pode me enviar o orçamento atualizado?', sender: 'contact', timestamp: 'Ontem', status: 'delivered' },
+        ]
+    },
+    {
+        contactId: 'ent1',
+        messages: [
+            { id: 'msg7', text: 'A caminho para a próxima entrega.', sender: 'contact', timestamp: '11:30', status: 'read' },
+        ]
+    },
+    {
+        contactId: 'for1',
+        messages: [
+            { id: 'msg8', text: 'Seu pedido foi despachado.', sender: 'contact', timestamp: 'Sexta-feira', status: 'read' },
+        ]
+    },
+    {
+        contactId: 'sup1',
+        messages: [
+            { id: 'msg9', text: 'Sua solicitação #123 foi resolvida.', sender: 'contact', timestamp: '14:20', status: 'read' },
+        ]
+    }
 ];

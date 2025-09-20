@@ -4,6 +4,7 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
@@ -13,7 +14,7 @@ import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
     ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon, TrendingDownIcon,
-    ShieldIcon
+    ShieldIcon, MessageSquareIcon
 } from './icons';
 
 const navItems = [
@@ -34,6 +35,7 @@ const navItems = [
     { path: '/financeiro', label: 'Financeiro', icon: DollarSignIcon },
     { path: '/relatorios', label: 'Relatório', icon: FileTextIcon },
     { path: '/auditoria', label: 'Auditoria/Logs', icon: ShieldIcon },
+    { path: '/chat', label: 'Chat DME', icon: MessageSquareIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
 ];
 

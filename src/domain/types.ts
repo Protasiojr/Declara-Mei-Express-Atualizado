@@ -188,3 +188,29 @@ export interface SystemLog {
     level: 'INFO' | 'AVISO' | 'ERRO';
     message: string;
 }
+
+export type ContactType = 'Cliente' | 'Entregador' | 'Fornecedor' | 'Suporte' | 'Outro';
+
+export interface ChatContact {
+    id: string;
+    name: string;
+    phone: string;
+    type: ContactType;
+    avatar?: string;
+    lastMessage?: string;
+    lastMessageTimestamp?: string;
+    unreadCount?: number;
+}
+
+export interface ChatMessage {
+    id: string;
+    text: string;
+    timestamp: string;
+    sender: 'me' | 'contact';
+    status: 'sent' | 'delivered' | 'read';
+}
+
+export interface ChatConversation {
+    contactId: string;
+    messages: ChatMessage[];
+}

@@ -32,6 +32,7 @@ import PromotionsPage from '../ui/pages/PromotionsPage';
 import PedidosPage from '../ui/pages/PedidosPage';
 import EntregasPage from '../ui/pages/EntregasPage';
 import AuditoriaPage from '../ui/pages/AuditoriaPage';
+import ChatPage from '../ui/pages/ChatPage';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -66,6 +67,7 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/funcionarios" element={<EmployeesPage />} />
                                     <Route path="/relatorios" element={<ReportsPage />} />
                                     <Route path="/auditoria" element={<AuditoriaPage />} />
+                                    <Route path="/chat" element={<ChatPage />} />
                                     <Route path="/nota-fiscal" element={<NotaFiscalPage />} />
                                     <Route path="/das" element={<DasPage />} />
                                     <Route path="/empresa" element={<CompanyPage />} />
