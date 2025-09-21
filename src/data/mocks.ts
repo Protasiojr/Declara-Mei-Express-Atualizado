@@ -4,8 +4,10 @@
 
 
 
+
+
 // FIX: Added missing exports to resolve import errors in multiple components.
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog, ChatContact, ChatConversation } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog, ChatContact, ChatConversation, SiteTemplate } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -470,4 +472,73 @@ export const mockConversations: ChatConversation[] = [
             { id: 'msg9', text: 'Sua solicitação #123 foi resolvida.', sender: 'contact', timestamp: '14:20', status: 'read' },
         ]
     }
+];
+
+export const mockSiteTemplates: SiteTemplate[] = [
+  {
+    id: 'tpl1',
+    name: 'Gourmet Burger',
+    imageUrl: 'https://placehold.co/300x150/FF6347/FFFFFF/png?text=Lanchonete',
+    description: 'Template moderno e apetitoso, ideal para hamburguerias e lanchonetes que querem destacar seus produtos.',
+    author: 'Chef Design',
+    rating: 5,
+    price: 199.90,
+    tags: ['Lanchonete'],
+    purchased: true,
+  },
+  {
+    id: 'tpl2',
+    name: 'Barbearia Vintage',
+    imageUrl: 'https://placehold.co/300x150/8B4513/FFFFFF/png?text=Barbearia',
+    description: 'Estilo clássico e elegante para barbearias que prezam pela tradição e bom gosto. Agendamento online integrado.',
+    author: 'Studio Classic',
+    rating: 4,
+    price: 249.90,
+    tags: ['Barbearia'],
+    purchased: false,
+  },
+  {
+    id: 'tpl3',
+    name: 'Açaí Tropical',
+    imageUrl: 'https://placehold.co/300x150/8A2BE2/FFFFFF/png?text=Açaí',
+    description: 'Vibrante e colorido, perfeito para lojas de açaí e sorveterias. Destaque para o cardápio e combos.',
+    author: 'Sabor Digital',
+    rating: 4,
+    price: 149.90,
+    tags: ['Venda de Açaí', 'Sorveteria'],
+    purchased: false,
+  },
+   {
+    id: 'tpl4',
+    name: 'Bar do Zé',
+    imageUrl: 'https://placehold.co/300x150/F4A460/FFFFFF/png?text=Bar',
+    description: 'Template com um toque rústico, ideal para bares e pubs. Galeria de fotos, menu de bebidas e eventos.',
+    author: 'Pub Web',
+    rating: 4,
+    price: 179.90,
+    tags: ['Bar'],
+    purchased: true,
+  },
+  {
+    id: 'tpl5',
+    name: 'Mãos de Fada',
+    imageUrl: 'https://placehold.co/300x150/FF69B4/FFFFFF/png?text=Manicure',
+    description: 'Delicado e profissional, este template é perfeito para manicures e salões de beleza. Mostre seu portfólio.',
+    author: 'Beleza Web',
+    rating: 5,
+    price: 219.90,
+    tags: ['Manicure'],
+    purchased: false,
+  },
+  {
+    id: 'tpl6',
+    name: 'Arte Criativa',
+    imageUrl: 'https://placehold.co/300x150/4682B4/FFFFFF/png?text=Artesanato',
+    description: 'Exiba seus produtos de artesanato com este template limpo e focado nas imagens. Loja virtual integrada.',
+    author: 'Pixel Craft',
+    rating: 4,
+    price: 299.90,
+    tags: ['Artesanato', 'Loja de personalizados'],
+    purchased: false,
+  }
 ];

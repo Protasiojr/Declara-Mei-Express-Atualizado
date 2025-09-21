@@ -4,6 +4,8 @@
 
 
 
+
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -213,4 +215,18 @@ export interface ChatMessage {
 export interface ChatConversation {
     contactId: string;
     messages: ChatMessage[];
+}
+
+export type TemplateTag = 'Lanchonete' | 'Bar' | 'Distribuidora de Bebidas' | 'Venda de Açaí' | 'Sorveteria' | 'Pipoqueiro' | 'Artesanato' | 'Loja de personalizados' | 'Barbearia' | 'Manicure';
+
+export interface SiteTemplate {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  author: string;
+  rating: number;
+  price: number;
+  tags: TemplateTag[];
+  purchased: boolean;
 }
