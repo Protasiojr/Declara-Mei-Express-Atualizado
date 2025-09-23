@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { PlusCircleIcon, Trash2Icon } from '../components/icons';
 import { Delivery, DeliveryStatus, DeliveryResponsible, Order, DeliveryPerson } from '../../domain/types';
@@ -181,6 +182,7 @@ const DeliveryModal: React.FC<{
             <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-green-800">
                 <div className="p-6 border-b border-green-800"><h2 className="text-2xl font-bold text-white">{deliveryToEdit ? 'Editar' : 'Nova'} Entrega</h2></div>
                 <form onSubmit={handleSubmit} className="overflow-y-auto flex-grow p-6 space-y-4">
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                     <SelectField label="Pedido Vinculado" name="orderId" value={delivery.orderId} onChange={handleChange} required>
                         <option value="">Selecione um pedido</option>
                         {mockOrders.map(o => <option key={o.id} value={o.id}>{o.id} - {o.customerName}</option>)}
@@ -191,9 +193,11 @@ const DeliveryModal: React.FC<{
                         <InputField label="Custo da Entrega" name="deliveryCost" type="number" value={delivery.deliveryCost} onChange={handleChange} />
                     </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Status" name="status" value={delivery.status} onChange={handleChange}>
                            {(['Pendente', 'Em trânsito', 'Entregue', 'Cancelada'] as DeliveryStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
                         </SelectField>
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                          <SelectField label="Responsável" name="responsible" value={delivery.responsible} onChange={handleChange}>
                            {(['Entregador Próprio', 'Motoboy', 'Transportadora'] as DeliveryResponsible[]).map(r => <option key={r} value={r}>{r}</option>)}
                         </SelectField>
@@ -228,6 +232,7 @@ const AssignModal: React.FC<{
                 <div className="p-6 border-b border-green-800"><h2 className="text-xl font-bold text-white">Atribuir Entregador</h2></div>
                 <div className="p-6 space-y-4">
                     <p className="text-gray-300">Selecione um entregador para a entrega <strong className="text-white">{delivery.id}</strong>.</p>
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                     <SelectField label="Entregador" name="deliveryPerson" value={selectedDPId} onChange={e => setSelectedDPId(e.target.value)} required>
                         <option value="">Selecione um entregador</option>
                         {initialMockDeliveryPersons.map(dp => <option key={dp.id} value={dp.id}>{dp.name} - {dp.deliveryCompany}</option>)}

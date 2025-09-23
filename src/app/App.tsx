@@ -6,6 +6,8 @@
 
 
 
+
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
@@ -36,6 +38,7 @@ import EntregasPage from '../ui/pages/EntregasPage';
 import AuditoriaPage from '../ui/pages/AuditoriaPage';
 import ChatPage from '../ui/pages/ChatPage';
 import SitePage from '../ui/pages/SitePage';
+import PostagensPage from '../ui/pages/PostagensPage';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -74,6 +77,7 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/nota-fiscal" element={<NotaFiscalPage />} />
                                     <Route path="/das" element={<DasPage />} />
                                     <Route path="/site" element={<SitePage />} />
+                                    <Route path="/postagens" element={<PostagensPage />} />
                                     <Route path="/empresa" element={<CompanyPage />} />
                                     <Route path="/perfil" element={<ProfilePage />} />
                                     <Route path="/configuracoes" element={<SettingsPage />} />

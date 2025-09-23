@@ -55,7 +55,8 @@ const SupplierModal: React.FC<{
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const fileNames = Array.from(e.target.files).map(file => file.name);
+            // FIX: Explicitly typed 'file' as File to resolve property 'name' not existing on 'unknown'.
+            const fileNames = Array.from(e.target.files).map((file: File) => file.name);
             setSupplier(prev => ({
                 ...prev,
                 invoices: [...(prev.invoices || []), ...fileNames]

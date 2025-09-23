@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { PlusCircleIcon, Trash2Icon, PlusIcon } from '../components/icons';
 import { Order, OrderStatus, OrderPaymentMethod, OrderItem, Customer, Product } from '../../domain/types';
@@ -185,9 +186,11 @@ const PedidoModal: React.FC<{
                 <form onSubmit={handleSubmit} className="overflow-y-auto flex-grow p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <InputField label="Cliente" name="customerName" value={order.customerName} onChange={e => setOrder({...order, customerName: e.target.value})} />
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Status" name="status" value={order.status} onChange={e => setOrder({...order, status: e.target.value as OrderStatus})}>
                             {(['Aberto', 'Pago', 'Cancelado', 'Entregue'] as OrderStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
                         </SelectField>
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Forma de Pagamento" name="paymentMethod" value={order.paymentMethod} onChange={e => setOrder({...order, paymentMethod: e.target.value as OrderPaymentMethod})}>
                              {(['Dinheiro', 'Cartão de Débito', 'Cartão de Crédito', 'PIX', 'Fiado', 'Misto'] as OrderPaymentMethod[]).map(pm => <option key={pm} value={pm}>{pm}</option>)}
                         </SelectField>

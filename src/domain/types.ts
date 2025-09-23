@@ -6,6 +6,10 @@
 
 
 
+
+
+
+
 export enum CustomerType {
   INDIVIDUAL = 'Pessoa Física',
   COMPANY = 'Pessoa Jurídica',
@@ -229,4 +233,30 @@ export interface SiteTemplate {
   price: number;
   tags: TemplateTag[];
   purchased: boolean;
+}
+
+export interface PostTemplate {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  author: string;
+  rating: number;
+  price: number;
+  tags: TemplateTag[];
+  purchased: boolean;
+}
+
+export type SocialPlatform = 'Instagram' | 'Facebook' | 'TikTok' | 'YouTube';
+
+export interface ScheduledPost {
+    id: string;
+    platform: SocialPlatform;
+    imageUrl: string;
+    title: string;
+    description: string;
+    scheduledDate: string;
+    scheduledTime: string;
+    recurringDays: DayOfWeek[];
+    status: 'Agendada' | 'Publicada' | 'Erro';
 }

@@ -203,6 +203,7 @@ const StockPage: React.FC = () => {
                         <form id="adjust-form" onSubmit={handleAdjustStock} className="space-y-4">
                             <InputField label="Produto" name="productName" value={selectedProduct.name} onChange={() => {}} disabled />
                             <InputField label="Nova Quantidade em Estoque" name="adjustQuantity" type="number" value={adjustQuantity} onChange={(e) => setAdjustQuantity(e.target.value)} required />
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                             <SelectField label="Motivo do Ajuste" name="adjustReason" value={adjustReason} onChange={(e) => setAdjustReason(e.target.value)}>
                                 <option value="">Selecione um motivo</option>
                                 <option value="Contagem de inventário">Contagem de inventário</option>

@@ -176,6 +176,7 @@ const ProductModal: React.FC<{
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InputField label="Unidade de Medida" name="unit" value={product.unit} onChange={handleChange} required />
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Tipo" name="type" value={product.type} onChange={handleChange}>
                             <option value={ProductType.RESALE}>Revenda</option>
                             <option value={ProductType.INDUSTRIALIZED}>Industrializado</option>
@@ -253,6 +254,7 @@ const AdjustStockModal: React.FC<{ product: Product; onClose: () => void; onSave
                     <div className="p-6 space-y-4">
                         <InputField label="Estoque Atual" name="currentStock" value={product.stock} onChange={() => { }} disabled />
                         <InputField label="Nova Quantidade em Estoque" name="newStock" type="number" value={newStock} onChange={(e) => setNewStock(e.target.value)} required />
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Motivo do Ajuste" name="reason" value={reason} onChange={(e) => setReason(e.target.value)}>
                             <option value="">Selecione um motivo</option>
                             <option value="Contagem de inventário">Contagem de inventário</option>

@@ -6,8 +6,14 @@
 
 
 
+
+
+
+
+
+
 // FIX: Added missing exports to resolve import errors in multiple components.
-import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog, ChatContact, ChatConversation, SiteTemplate } from '../domain/types';
+import { Customer, CustomerType, Employee, Product, ProductType, Service, Payable, Receivable, Supplier, Promotion, DeliveryPerson, DayOfWeek, Order, Delivery, AuditUser, UserAction, SystemLog, ChatContact, ChatConversation, SiteTemplate, PostTemplate, ScheduledPost } from '../domain/types';
 
 export const initialMockCustomers: Customer[] = [
     { 
@@ -541,4 +547,109 @@ export const mockSiteTemplates: SiteTemplate[] = [
     tags: ['Artesanato', 'Loja de personalizados'],
     purchased: false,
   }
+];
+
+export const mockPostTemplates: PostTemplate[] = [
+  {
+    id: 'post_tpl1',
+    name: 'Promoção Hambúrguer do Dia',
+    imageUrl: 'https://placehold.co/300x150/FFC107/000000/png?text=Burger+Post',
+    description: 'Template vibrante para anunciar a promoção do seu hambúrguer do dia. Totalmente editável.',
+    author: 'Marketing Gourmet',
+    rating: 5,
+    price: 29.90,
+    tags: ['Lanchonete'],
+    purchased: true,
+  },
+  {
+    id: 'post_tpl2',
+    name: 'Happy Hour Cerveja',
+    imageUrl: 'https://placehold.co/300x150/000000/FFFFFF/png?text=Happy+Hour',
+    description: 'Design moderno e chamativo para divulgar seu happy hour. Ideal para bares e distribuidoras.',
+    author: 'Pub Criativo',
+    rating: 4,
+    price: 19.90,
+    tags: ['Bar', 'Distribuidora de Bebidas'],
+    purchased: false,
+  },
+  {
+    id: 'post_tpl3',
+    name: 'Corte e Barba Estiloso',
+    imageUrl: 'https://placehold.co/300x150/A52A2A/FFFFFF/png?text=Barber+Shop',
+    description: 'Post com estilo vintage para promover cortes de cabelo e barba. Perfeito para barbearias.',
+    author: 'Navalha Design',
+    rating: 5,
+    price: 39.90,
+    tags: ['Barbearia'],
+    purchased: false,
+  },
+  {
+    id: 'post_tpl4',
+    name: 'Unhas da Semana',
+    imageUrl: 'https://placehold.co/300x150/FFC0CB/000000/png?text=Nails',
+    description: 'Template delicado e elegante para manicures mostrarem seu trabalho. Destaque suas unhas artísticas.',
+    author: 'Esmalte Digital',
+    rating: 4,
+    price: 15.00,
+    tags: ['Manicure'],
+    purchased: true,
+  },
+  {
+    id: 'post_tpl5',
+    name: 'Açaí na Tigela Refrescante',
+    imageUrl: 'https://placehold.co/300x150/4B0082/FFFFFF/png?text=Açaí+Bowl',
+    description: 'Imagem de dar água na boca para promover seu açaí. Ótimo para posts de verão.',
+    author: 'Tigela Criativa',
+    rating: 5,
+    price: 24.90,
+    tags: ['Venda de Açaí', 'Sorveteria'],
+    purchased: false,
+  },
+  {
+    id: 'post_tpl6',
+    name: 'Feito à Mão com Amor',
+    imageUrl: 'https://placehold.co/300x150/D2B48C/000000/png?text=Handmade',
+    description: 'Template rústico e charmoso para divulgar produtos de artesanato e personalizados.',
+    author: 'Ateliê Pixel',
+    rating: 4,
+    price: 22.50,
+    tags: ['Artesanato', 'Loja de personalizados'],
+    purchased: false,
+  }
+];
+
+export const mockScheduledPosts: ScheduledPost[] = [
+    {
+        id: 'sp1',
+        platform: 'Instagram',
+        imageUrl: 'https://placehold.co/300x300/FF6347/FFFFFF/png?text=Promoção',
+        title: 'Promoção da Semana!',
+        description: 'Não perca nosso hambúrguer especial esta semana!',
+        scheduledDate: '2024-08-15',
+        scheduledTime: '18:00',
+        recurringDays: ['Qua', 'Sex'],
+        status: 'Agendada'
+    },
+    {
+        id: 'sp2',
+        platform: 'Instagram',
+        imageUrl: 'https://placehold.co/300x300/4682B4/FFFFFF/png?text=Novidade',
+        title: 'Nova Bebida Refrescante',
+        description: 'Venha experimentar nossa nova limonada suíça.',
+        scheduledDate: '2024-08-10',
+        scheduledTime: '12:00',
+        recurringDays: [],
+        status: 'Agendada'
+    },
+    {
+        id: 'sp3',
+        platform: 'Facebook',
+        imageUrl: 'https://placehold.co/300x300/3b5998/FFFFFF/png?text=Facebook',
+        title: 'Curta nossa página no Facebook!',
+        description: 'Fique por dentro de todas as novidades e promoções exclusivas para nossos seguidores.',
+        scheduledDate: '2024-08-20',
+        scheduledTime: '10:00',
+        recurringDays: ['Ter', 'Qui'],
+        status: 'Agendada'
+    }
 ];

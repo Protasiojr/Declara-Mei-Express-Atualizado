@@ -269,6 +269,7 @@ const AddContactTab: React.FC<{onSave: (contact: ChatContact) => void; onCancel:
              <h3 className="text-lg font-semibold text-white">Adicionar Novo Contato</h3>
              <InputField label="Nome" value={name} onChange={setName} required/>
              <InputField label="Número (+55 11 98888-7777)" value={phone} onChange={setPhone} required/>
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
              <SelectField label="Tipo de Contato" value={type} onChange={(val) => setType(val as ContactType)}>
                  {(['Cliente', 'Entregador', 'Fornecedor', 'Suporte', 'Outro'] as ContactType[]).map(t => <option key={t} value={t}>{t}</option>)}
              </SelectField>
@@ -303,6 +304,7 @@ const ContactModal: React.FC<{ type: 'details' | 'edit' | 'delete', contact: Cha
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
                         <InputField label="Nome" value={editedContact.name} onChange={(val) => setEditedContact({...editedContact, name: val})}/>
                         <InputField label="Telefone" value={editedContact.phone} onChange={(val) => setEditedContact({...editedContact, phone: val})}/>
+{/* FIX: Added children to SelectField to provide options, resolving missing property error. */}
                         <SelectField label="Tipo" value={editedContact.type} onChange={(val) => setEditedContact({...editedContact, type: val as ContactType})}>
                             {(['Cliente', 'Entregador', 'Fornecedor', 'Suporte', 'Outro'] as ContactType[]).map(t => <option key={t} value={t}>{t}</option>)}
                         </SelectField>

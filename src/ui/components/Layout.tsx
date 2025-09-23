@@ -7,6 +7,8 @@
 
 
 
+
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../app/context/AuthContext';
@@ -16,7 +18,7 @@ import {
     HomeIcon, UsersIcon, ShoppingCartIcon, PackageIcon, DollarSignIcon,
     BuildingIcon, UserCircleIcon, FileTextIcon, SettingsIcon, LogOutIcon, ChevronDownIcon,
     ArchiveIcon, TruckIcon, MenuIcon, ClipboardListIcon, TrendingDownIcon,
-    ShieldIcon, MessageSquareIcon, GlobeIcon
+    ShieldIcon, MessageSquareIcon, GlobeIcon, SendIcon
 } from './icons';
 
 const navItems = [
@@ -39,6 +41,7 @@ const navItems = [
     { path: '/auditoria', label: 'Auditoria/Logs', icon: ShieldIcon },
     { path: '/chat', label: 'Chat DME', icon: MessageSquareIcon },
     { path: '/site', label: 'Site', icon: GlobeIcon },
+    { path: '/postagens', label: 'Postagens', icon: SendIcon },
     { path: '/configuracoes', label: 'Configuração', icon: SettingsIcon },
 ];
 
