@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { ChatContact, ContactType, ChatConversation, ChatMessage } from '../../domain/types';
 import { mockChatContacts, mockConversations } from '../../data/mocks';

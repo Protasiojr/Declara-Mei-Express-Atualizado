@@ -1,9 +1,7 @@
-
-
 import React, { useState, useMemo, useRef } from 'react';
 import { PostTemplate, TemplateTag, SocialPlatform, ScheduledPost, DayOfWeek } from '../../domain/types';
 import { mockPostTemplates, mockScheduledPosts } from '../../data/mocks';
-import { SearchIcon, Trash2Icon, PlusCircleIcon } from '../components/icons';
+import { SearchIcon, Trash2Icon, PlusCircleIcon, PencilIcon } from '../components/icons';
 
 // --- SUB-COMPONENTS ---
 
@@ -56,23 +54,40 @@ const initialPostState: Omit<ScheduledPost, 'id' | 'status'> = {
     recurringDays: []
 };
 
-const ScheduledPostsTab: React.FC<{ platform: SocialPlatform; posts: ScheduledPost[]; onAddPost: (post: Omit<ScheduledPost, 'id' | 'status'>) => void; }> = ({ platform, posts, onAddPost }) => {
-    const [newPost, setNewPost] = useState(initialPostState);
+const ScheduledPostsTab: React.FC<{
+    platform: SocialPlatform;
+    posts: ScheduledPost[];
+    onSavePost: (post: Omit<ScheduledPost, 'status'> & { id?: string }) => void;
+    onDeletePost: (postId: string, reason: string) => void;
+}> = ({ platform, posts, onSavePost, onDeletePost }) => {
+    const [postData, setPostData] = useState(initialPostState);
+    const [postToEdit, setPostToEdit] = useState<ScheduledPost | null>(null);
+    const [postToDelete, setPostToDelete] = useState<ScheduledPost | null>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const isEditing = !!postToEdit;
+
+    React.useEffect(() => {
+        if (postToEdit) {
+            setPostData(postToEdit);
+        } else {
+            setPostData(initialPostState);
+        }
+    }, [postToEdit]);
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setNewPost(prev => ({ ...prev, imageUrl: reader.result as string }));
+                setPostData(prev => ({ ...prev, imageUrl: reader.result as string }));
             };
             reader.readAsDataURL(file);
         }
     };
 
     const handleDayToggle = (day: DayOfWeek) => {
-        setNewPost(prev => {
+        setPostData(prev => {
             const currentDays = prev.recurringDays || [];
             const newDays = currentDays.includes(day)
                 ? currentDays.filter(d => d !== day)
@@ -83,70 +98,102 @@ const ScheduledPostsTab: React.FC<{ platform: SocialPlatform; posts: ScheduledPo
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onAddPost({ ...newPost, platform });
-        setNewPost(initialPostState);
+        onSavePost({ ...postData, platform, id: postToEdit?.id });
+        setPostData(initialPostState);
+        setPostToEdit(null);
     };
     
+    const handleCancelEdit = () => {
+        setPostData(initialPostState);
+        setPostToEdit(null);
+    };
+
     const weekDays: DayOfWeek[] = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card title={`Nova Postagem para ${platform}`}>
+            {postToDelete && (
+                <DeletePostModal
+                    post={postToDelete}
+                    onConfirm={(id, reason) => {
+                        onDeletePost(id, reason);
+                        setPostToDelete(null);
+                    }}
+                    onCancel={() => setPostToDelete(null)}
+                />
+            )}
+            <Card title={isEditing ? `Editar Postagem para ${platform}` : `Nova Postagem para ${platform}`}>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="w-full h-64 bg-green-800 rounded-md flex items-center justify-center relative overflow-hidden group">
-                        {newPost.imageUrl ? (
-                             <img src={newPost.imageUrl} alt="Preview da postagem" className="w-full h-full object-cover" />
+                        {postData.imageUrl ? (
+                             <img src={postData.imageUrl} alt="Preview da postagem" className="w-full h-full object-cover" />
                         ) : (
                              <p className="text-gray-400">Sua imagem aparecerá aqui</p>
                         )}
                         <button type="button" onClick={() => imageInputRef.current?.click()} className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                            <PlusCircleIcon className="w-8 h-8 mr-2"/> Adicionar Imagem
+                            <PlusCircleIcon className="w-8 h-8 mr-2"/> {isEditing ? 'Alterar' : 'Adicionar'} Imagem
                         </button>
                         <input type="file" ref={imageInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
                     </div>
 
-                    <InputField label="Título" name="title" value={newPost.title} onChange={(e) => setNewPost({...newPost, title: e.target.value})} placeholder="Título da sua postagem" required/>
-                    <TextAreaField label="Descrição" name="description" value={newPost.description} onChange={(e) => setNewPost({...newPost, description: e.target.value})} placeholder="Escreva uma legenda..."/>
+                    <InputField label="Título" name="title" value={postData.title} onChange={(e) => setPostData({...postData, title: e.target.value})} placeholder="Título da sua postagem" required/>
+                    <TextAreaField label="Descrição" name="description" value={postData.description} onChange={(e) => setPostData({...postData, description: e.target.value})} placeholder="Escreva uma legenda..."/>
                     
                     <fieldset className="border border-green-800 p-3 rounded-lg">
                         <legend className="px-2 text-green-400 text-sm font-semibold">Agendamento</legend>
                         <div className="grid grid-cols-2 gap-4">
-                             <InputField label="Data" name="scheduledDate" type="date" value={newPost.scheduledDate} onChange={(e) => setNewPost({...newPost, scheduledDate: e.target.value})} required/>
-                             <InputField label="Horário" name="scheduledTime" type="time" value={newPost.scheduledTime} onChange={(e) => setNewPost({...newPost, scheduledTime: e.target.value})} required/>
+                             <InputField label="Data" name="scheduledDate" type="date" value={postData.scheduledDate} onChange={(e) => setPostData({...postData, scheduledDate: e.target.value})} required/>
+                             <InputField label="Horário" name="scheduledTime" type="time" value={postData.scheduledTime} onChange={(e) => setPostData({...postData, scheduledTime: e.target.value})} required/>
                         </div>
                         <div className="mt-3">
                              <label className="block text-sm font-medium text-gray-300 mb-2">Repetir nos dias (Opcional)</label>
                             <div className="flex flex-wrap gap-2">
                                 {weekDays.map(day => (
-                                    <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1 text-sm rounded-full ${newPost.recurringDays?.includes(day) ? 'bg-green-600 text-white' : 'bg-green-800 text-gray-300'}`}>
+                                    <button type="button" key={day} onClick={() => handleDayToggle(day)} className={`px-3 py-1 text-sm rounded-full ${postData.recurringDays?.includes(day) ? 'bg-green-600 text-white' : 'bg-green-800 text-gray-300'}`}>
                                         {day}
                                     </button>
                                 ))}
                             </div>
                         </div>
                     </fieldset>
-
-                    <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-500 disabled:opacity-50" disabled={!newPost.imageUrl || !newPost.title}>
-                        Agendar Postagem
-                    </button>
+                    <div className="flex gap-4">
+                         {isEditing && (
+                            <button type="button" onClick={handleCancelEdit} className="w-full bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-500">
+                                Cancelar Edição
+                            </button>
+                        )}
+                        <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-500 disabled:opacity-50" disabled={!postData.imageUrl || !postData.title}>
+                             {isEditing ? 'Salvar Alterações' : 'Agendar Postagem'}
+                        </button>
+                    </div>
                 </form>
             </Card>
             
             <div className="bg-green-900 p-6 rounded-lg shadow-md border border-green-800">
                 <h3 className="text-xl font-semibold text-white mb-6">Postagens Agendadas</h3>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                <div className="space-y-3">
                      {posts.length > 0 ? posts.map(post => (
-                        <div key={post.id} className="bg-green-800/50 p-3 rounded-lg flex items-start gap-4">
+                        <div key={post.id} className="bg-green-800/50 p-3 rounded-lg flex items-center gap-3">
                             <img src={post.imageUrl} alt={post.title} className="w-16 h-16 object-cover rounded-md flex-shrink-0" />
-                            <div className="flex-grow">
-                                <p className="font-bold text-white">{post.title}</p>
+                            <div className="flex-grow min-w-0">
+                                <p className="font-bold text-white truncate">{post.title}</p>
                                 <p className="text-sm text-gray-300 truncate">{post.description}</p>
-                                <p className="text-xs text-green-400 mt-1">
-                                    {new Date(post.scheduledDate + 'T00:00:00').toLocaleDateString('pt-BR')} às {post.scheduledTime}
-                                </p>
-                                {post.recurringDays.length > 0 && (
-                                     <p className="text-xs text-yellow-400 mt-1">Repete: {post.recurringDays.join(', ')}</p>
-                                )}
+                                <div className="flex items-center gap-2 text-xs mt-1 flex-wrap">
+                                    <span className="text-green-400">
+                                        {new Date(post.scheduledDate + 'T00:00:00').toLocaleDateString('pt-BR')} às {post.scheduledTime}
+                                    </span>
+                                    {post.recurringDays.length > 0 && (
+                                         <span className="text-yellow-400">(Repete: {post.recurringDays.join(', ')})</span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex-shrink-0 flex items-center gap-2">
+                                <button onClick={() => setPostToEdit(post)} title="Editar" className="p-2 rounded-full text-green-400 hover:bg-green-700/50 transition-colors">
+                                    <PencilIcon className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => setPostToDelete(post)} title="Excluir" className="p-2 rounded-full text-red-400 hover:bg-red-700/50 transition-colors">
+                                    <Trash2Icon className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
                      )) : (
@@ -269,6 +316,25 @@ const DeleteTemplateModal: React.FC<{ templateName: string; onConfirm: (reason: 
     );
 };
 
+const DeletePostModal: React.FC<{ post: ScheduledPost; onConfirm: (id: string, reason: string) => void; onCancel: () => void; }> = ({ post, onConfirm, onCancel }) => {
+    const [reason, setReason] = useState('');
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
+            <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-md border border-red-800">
+                <div className="p-6 border-b border-red-800"><h2 className="text-xl font-bold text-red-400">Excluir Postagem Agendada</h2></div>
+                <div className="p-6 space-y-4">
+                    <p className="text-gray-300">Você tem certeza que deseja excluir a postagem <strong className="text-white">"{post.title}"</strong>? Por favor, informe o motivo.</p>
+                    <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} className="mt-1 block w-full bg-green-800 border-green-700 rounded-md text-white" placeholder="Justificativa da exclusão..."></textarea>
+                </div>
+                <div className="p-4 bg-green-950/50 border-t border-red-800 flex justify-end space-x-4">
+                    <button onClick={onCancel} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 font-semibold text-white">Cancelar</button>
+                    <button onClick={() => onConfirm(post.id, reason)} disabled={!reason.trim()} className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 font-semibold text-white disabled:opacity-50">Confirmar Exclusão</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 // --- MAIN PAGE COMPONENT ---
 const PostagensPage: React.FC = () => {
@@ -284,14 +350,27 @@ const PostagensPage: React.FC = () => {
         setTemplates(tpls => tpls.filter(t => t.id !== id));
     };
 
-    const handleAddPost = (postData: Omit<ScheduledPost, 'id' | 'status'>) => {
-        const newPost: ScheduledPost = {
-            ...postData,
-            id: `sp-${Date.now()}`,
-            status: 'Agendada'
-        };
-        setScheduledPosts(prev => [newPost, ...prev]);
-        alert(`Post para ${postData.platform} agendado com sucesso!`);
+    const handleSavePost = (postData: Omit<ScheduledPost, 'status'> & { id?: string }) => {
+        if (postData.id) {
+            // Update
+            setScheduledPosts(prev => prev.map(p => p.id === postData.id ? { ...p, ...postData, id: postData.id, status: 'Agendada' } : p));
+            alert('Postagem atualizada com sucesso!');
+        } else {
+            // Add new
+            const newPost: ScheduledPost = {
+                ...(postData as Omit<ScheduledPost, 'id' | 'status'>),
+                id: `sp-${Date.now()}`,
+                status: 'Agendada'
+            };
+            setScheduledPosts(prev => [newPost, ...prev]);
+            alert(`Post para ${postData.platform} agendado com sucesso!`);
+        }
+    };
+    
+    const handleDeletePost = (postId: string, reason: string) => {
+        console.log(`Excluindo post ${postId} pelo motivo: ${reason}`);
+        setScheduledPosts(prev => prev.filter(p => p.id !== postId));
+        alert('Postagem excluída com sucesso!');
     };
     
     const tabs: {name: SocialPlatform | 'Templates de Postagem' | 'Configurações'}[] = [
@@ -317,10 +396,10 @@ const PostagensPage: React.FC = () => {
 
             <div>
                 {activeTab === 'Templates de Postagem' && <TemplatesTab templates={templates} onPurchase={handlePurchaseTemplate} onDelete={handleDeleteTemplate}/>}
-                {activeTab === 'Instagram' && <ScheduledPostsTab platform="Instagram" posts={scheduledPosts.filter(p => p.platform === 'Instagram')} onAddPost={handleAddPost} />}
-                {activeTab === 'Facebook' && <ScheduledPostsTab platform="Facebook" posts={scheduledPosts.filter(p => p.platform === 'Facebook')} onAddPost={handleAddPost} />}
-                {activeTab === 'TikTok' && <ScheduledPostsTab platform="TikTok" posts={scheduledPosts.filter(p => p.platform === 'TikTok')} onAddPost={handleAddPost} />}
-                {activeTab === 'YouTube' && <ScheduledPostsTab platform="YouTube" posts={scheduledPosts.filter(p => p.platform === 'YouTube')} onAddPost={handleAddPost} />}
+                {activeTab === 'Instagram' && <ScheduledPostsTab platform="Instagram" posts={scheduledPosts.filter(p => p.platform === 'Instagram')} onSavePost={handleSavePost} onDeletePost={handleDeletePost} />}
+                {activeTab === 'Facebook' && <ScheduledPostsTab platform="Facebook" posts={scheduledPosts.filter(p => p.platform === 'Facebook')} onSavePost={handleSavePost} onDeletePost={handleDeletePost} />}
+                {activeTab === 'TikTok' && <ScheduledPostsTab platform="TikTok" posts={scheduledPosts.filter(p => p.platform === 'TikTok')} onSavePost={handleSavePost} onDeletePost={handleDeletePost} />}
+                {activeTab === 'YouTube' && <ScheduledPostsTab platform="YouTube" posts={scheduledPosts.filter(p => p.platform === 'YouTube')} onSavePost={handleSavePost} onDeletePost={handleDeletePost} />}
                 {activeTab === 'Configurações' && <SettingsTab />}
             </div>
         </div>

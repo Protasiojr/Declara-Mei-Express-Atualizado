@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { PlusCircleIcon, PackageIcon, BarcodeIcon, ClockIcon, WrenchIcon, Trash2Icon, ChevronDownIcon } from '../components/icons';
 import { mockProducts, mockServices } from '../../data/mocks';
