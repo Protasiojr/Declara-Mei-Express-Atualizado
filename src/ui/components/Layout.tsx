@@ -65,7 +65,7 @@ const Sidebar: React.FC<{ isSidebarOpen: boolean, setIsSidebarOpen: (isOpen: boo
             ></div>
             <aside className={`fixed inset-y-0 left-0 w-64 bg-green-950 text-gray-300 flex flex-col border-r border-green-800 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="pt-4 pb-2 border-b border-green-800 text-center">
-                    <h1 className="text-xl font-bold text-white">Declara Mei Express</h1>
+                    <h1 className="text-xl font-bold text-white">Controla Fácil Express</h1>
                     {logo && (
                         <div className="px-4 py-4">
                             <img src={logo} alt="Logo da Empresa" className="max-w-full h-auto mx-auto my-2 rounded-md max-h-56" />

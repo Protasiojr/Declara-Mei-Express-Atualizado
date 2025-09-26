@@ -16,7 +16,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-green-950 text-gray-200">
       <div className="w-full max-w-md p-8 space-y-8 bg-green-900 rounded-lg shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Declara Mei Express</h1>
+          <h1 className="text-3xl font-bold text-white">Controla Fácil Express</h1>
           <p className="mt-2 text-gray-400">Faça login para continuar</p>
         </div>
         <form className="space-y-6" onSubmit={handleLogin}>
