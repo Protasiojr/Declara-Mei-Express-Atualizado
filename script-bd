@@ -1,0 +1,109 @@
+-- Criação do banco
+CREATE DATABASE controle_facil;
+\c controle_facil
+
+-- Tabela de clientes
+CREATE TABLE clientes (
+    id SERIAL PRIMARY KEY,
+    tipo_cliente VARCHAR(10) CHECK (tipo_cliente IN ('Física', 'Jurídica')) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14), -- obrigatório se tipo_cliente = 'Física'
+    cnpj VARCHAR(18), -- obrigatório se tipo_cliente = 'Jurídica'
+    data_nascimento DATE,
+    sexo VARCHAR(10),
+    email VARCHAR(100),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de telefones
+CREATE TABLE telefones (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    tipo VARCHAR(20) CHECK (tipo IN ('Celular', 'Residencial', 'Comercial', 'Outro')),
+    numero VARCHAR(20) NOT NULL,
+    principal BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+);
+
+-- Tabela de logins
+CREATE TABLE logins (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    ultimo_login TIMESTAMP,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+);
+
+-- Tabela de endereços
+CREATE TABLE enderecos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    rua VARCHAR(100),
+    numero VARCHAR(10),
+    complemento VARCHAR(50),
+    bairro VARCHAR(50),
+    cidade VARCHAR(50),
+    estado VARCHAR(2),
+    cep VARCHAR(10),
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+);
+
+-- Tabela de compras
+CREATE TABLE compras (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valor_total NUMERIC(10,2) DEFAULT 0.00,
+    status VARCHAR(20) CHECK (status IN ('Pendente', 'Pago', 'Cancelado')) DEFAULT 'Pendente',
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+);
+
+-- Tabela de itens da compra
+CREATE TABLE itens_compra (
+    id SERIAL PRIMARY KEY,
+    compra_id INT NOT NULL,
+    tipo_item VARCHAR(10) CHECK (tipo_item IN ('Produto', 'Serviço')),
+    item_id INT NOT NULL,
+    quantidade INT CHECK (quantidade > 0),
+    preco_unitario NUMERIC(10,2) CHECK (preco_unitario >= 0),
+    FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE
+);
+
+-- TABELAS SEPARADAS (opção 1)
+
+CREATE TABLE produtos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco NUMERIC(10,2) NOT NULL,
+    estoque INT DEFAULT 0,
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE servicos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco NUMERIC(10,2) NOT NULL,
+    duracao_minutos INT,
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- TABELA UNIFICADA (opção 2)
+
+CREATE TABLE produtos_servicos (
+    id SERIAL PRIMARY KEY,
+    tipo VARCHAR(10) CHECK (tipo IN ('Produto', 'Serviço')),
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco NUMERIC(10,2) NOT NULL,
+    estoque INT, -- pode ser NULL para serviços
+    duracao_minutos INT, -- pode ser NULL para produtos
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
