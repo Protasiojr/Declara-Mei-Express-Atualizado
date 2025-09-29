@@ -1,10 +1,156 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../app/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
+const PasswordStrengthMeter: React.FC<{ password?: string }> = ({ password = '' }) => {
+  const [strength, setStrength] = useState({
+    score: 0,
+    label: 'Fraca',
+    color: 'bg-red-500',
+    width: 'w-0'
+  });
+
+  const [criteria, setCriteria] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    specialChar: false,
+  });
+
+  useEffect(() => {
+    const newCriteria = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+    setCriteria(newCriteria);
+
+    const score = Object.values(newCriteria).filter(Boolean).length;
+    let newStrength = { score: 0, label: 'Fraca', color: 'bg-red-500', width: 'w-0' };
+
+    if (score === 1) {
+      newStrength = { score, label: 'Fraca', color: 'bg-red-500', width: 'w-1/4' };
+    } else if (score === 2) {
+      newStrength = { score, label: 'Média', color: 'bg-yellow-500', width: 'w-2/4' };
+    } else if (score === 3) {
+      newStrength = { score, label: 'Média', color: 'bg-yellow-500', width: 'w-3/4' };
+    } else if (score === 4) {
+      newStrength = { score, label: 'Forte', color: 'bg-green-500', width: 'w-full' };
+    }
+    setStrength(newStrength);
+  }, [password]);
+
+  const CriteriaItem: React.FC<{ met: boolean; children: React.ReactNode }> = ({ met, children }) => (
+    <li className={`flex items-center text-xs ${met ? 'text-green-400' : 'text-gray-400'}`}>
+       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+         {met ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>}
+      </svg>
+      {children}
+    </li>
+  );
+
+  return (
+    <div>
+      <div className="w-full bg-green-950 rounded-full h-2 my-2 border border-green-800">
+        <div className={`h-full rounded-full transition-all duration-300 ${strength.color} ${strength.width}`}></div>
+      </div>
+       <ul className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
+            <CriteriaItem met={criteria.length}>Pelo menos 8 caracteres</CriteriaItem>
+            <CriteriaItem met={criteria.uppercase}>Pelo menos 1 letra maiúscula</CriteriaItem>
+            <CriteriaItem met={criteria.number}>Pelo menos 1 número</CriteriaItem>
+            <CriteriaItem met={criteria.specialChar}>Pelo menos 1 caractere especial</CriteriaItem>
+        </ul>
+    </div>
+  );
+};
+
+
+const RegistrationModal: React.FC<{
+    onClose: () => void;
+    onRegister: () => void;
+}> = ({ onClose, onRegister }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      alert('As senhas não coincidem.');
+      return;
+    }
+    // Lógica para enviar dados para o sistema aqui
+    onRegister();
+  };
+
+  return (
+     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+      <div className="bg-green-900 rounded-lg shadow-xl w-full max-w-md border border-green-800 flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-green-800 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-white">Cadastro de Novo Usuário</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-3xl leading-none" aria-label="Fechar">&times;</button>
+        </div>
+        <form onSubmit={handleSubmit} className="overflow-y-auto flex-grow p-6 space-y-4">
+          <div>
+            <label htmlFor="reg-email" className="block text-sm font-medium text-gray-300">Email</label>
+            <input
+              id="reg-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="reg-password"
+                   className="block text-sm font-medium text-gray-300">Senha</label>
+            <input
+              id="reg-password"
+              name="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+            />
+            <PasswordStrengthMeter password={password} />
+          </div>
+          <div>
+            <label htmlFor="confirm-password"
+                   className="block text-sm font-medium text-gray-300">Confirmar Senha</label>
+            <input
+              id="confirm-password"
+              name="confirmPassword"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-green-800 border border-green-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+        </form>
+        <div className="p-4 bg-green-950/50 border-t border-green-800 rounded-b-lg flex justify-end space-x-4">
+            <button type="button" onClick={onClose} className="px-6 py-2 rounded-lg bg-green-800 hover:bg-green-700 text-white font-semibold">
+                Cancelar
+            </button>
+            <button type="submit" form="registration-form" onClick={handleSubmit} className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold">
+                Enviar
+            </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,7 +158,14 @@ const LoginPage: React.FC = () => {
     navigate('/dashboard');
   };
 
+  const handleRegister = () => {
+    alert('Dados enviados com sucesso!');
+    setIsModalOpen(false);
+  };
+
   return (
+    <>
+    {isModalOpen && <RegistrationModal onClose={() => setIsModalOpen(false)} onRegister={handleRegister} />}
     <div className="min-h-screen flex items-center justify-center bg-green-950 text-gray-200">
       <div className="w-full max-w-md p-8 space-y-8 bg-green-900 rounded-lg shadow-lg">
         <div className="text-center">
@@ -60,6 +213,15 @@ const LoginPage: React.FC = () => {
               Entrar
             </button>
           </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full flex justify-center py-2 px-4 border border-green-700 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-green-800 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600"
+            >
+              Cadastro
+            </button>
+          </div>
         </form>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -82,6 +244,7 @@ const LoginPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
